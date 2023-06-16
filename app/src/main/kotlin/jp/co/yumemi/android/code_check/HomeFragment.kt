@@ -26,7 +26,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         val binding = FragmentHomeBinding.bind(view)
 
-        val viewModel = RepositoryViewModel(requireContext())
+        val viewModel = RepositoryViewModelTemp(requireContext())
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
@@ -59,7 +59,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     fun gotoRepositoryFragment(repositoryItem: RepositoryItem) {
         val action = HomeFragmentDirections
-            .actionHomeFragmentToPreviewFragment(repositoryResponse = repositoryItem)
+            .actionHomeFragmentToPreviewFragment(repository = repositoryItem)
         findNavController().navigate(action)
     }
 }
