@@ -14,6 +14,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import jp.co.yumemi.android.code_check.MainActivity.Companion.lastSearchDate
+import jp.co.yumemi.android.code_check.model.RepositoryResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -29,7 +30,7 @@ class RepositoryViewModel(
 ) : ViewModel() {
 
     // 検索結果
-    fun searchResults(inputText: String): List<item> = runBlocking {
+    fun searchResults(inputText: String): List<RepositoryResponse> = runBlocking {
         val client = HttpClient(Android)
 
         return@runBlocking GlobalScope.async {
@@ -43,7 +44,7 @@ class RepositoryViewModel(
 
             val jsonItems = jsonBody.optJSONArray("items")!!
 
-            val items = mutableListOf<item>()
+            val items = mutableListOf<RepositoryResponse>()
 
             /**
              * アイテムの個数分ループする
@@ -59,7 +60,7 @@ class RepositoryViewModel(
                 val openIssuesCount = jsonItem.optLong("open_issues_count")
 
                 items.add(
-                    item(
+                    RepositoryResponse(
                         name = name,
                         ownerIconUrl = ownerIconUrl,
                         language = context.getString(R.string.written_language, language),
@@ -78,7 +79,7 @@ class RepositoryViewModel(
     }
 }
 
-@Parcelize
+/*@Parcelize
 data class item(
     val name: String,
     val ownerIconUrl: String,
@@ -87,4 +88,4 @@ data class item(
     val watchersCount: Long,
     val forksCount: Long,
     val openIssuesCount: Long,
-) : Parcelable
+) : Parcelable*/

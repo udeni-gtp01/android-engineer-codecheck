@@ -26,7 +26,7 @@ class PreviewFragment : Fragment(R.layout.fragment_preview) {
 
         binding = FragmentPreviewBinding.bind(view)
 
-        var resultItem = args.item
+        var resultItem = args.repositoryResponse
 
         _binding.ownerIconView.load(resultItem.ownerIconUrl)
         _binding.nameView.text = resultItem.name

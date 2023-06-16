@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_previewFragment"
-            app:destination="@id/previewFragment" />
+            app:destination="@id/previewFragment"></action>
     </fragment>
 
     <fragment
@@ -21,8 +21,8 @@
         android:label="@string/app_name"
         tools:layout="@layout/fragment_preview">
         <argument
-            android:name="item"
-            app:argType="jp.co.yumemi.android.code_check.item" />
+            android:name="repositoryResponse"
+            app:argType="jp.co.yumemi.android.code_check.model.RepositoryResponse" />
     </fragment>
 
 </navigation>
