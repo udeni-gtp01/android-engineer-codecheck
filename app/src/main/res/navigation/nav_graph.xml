@@ -22,7 +22,7 @@
         tools:layout="@layout/fragment_preview">
         <argument
             android:name="repositoryResponse"
-            app:argType="jp.co.yumemi.android.code_check.model.RepositoryResponse" />
+            app:argType="jp.co.yumemi.android.code_check.model.RepositoryItem" />
     </fragment>
 
 </navigation>
