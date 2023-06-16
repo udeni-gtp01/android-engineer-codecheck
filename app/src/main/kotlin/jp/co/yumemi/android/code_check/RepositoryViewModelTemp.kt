@@ -4,7 +4,6 @@
 package jp.co.yumemi.android.code_check
 
 import android.content.Context
-import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
@@ -20,14 +19,12 @@ import jp.co.yumemi.android.code_check.model.ServerResponse
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import kotlinx.parcelize.Parcelize
-import org.json.JSONObject
 import java.util.Date
 
 /**
  * PreviewFragment で使う
  */
-class RepositoryViewModel(
+class RepositoryViewModelTemp(
     val context: Context
 ) : ViewModel() {
 
