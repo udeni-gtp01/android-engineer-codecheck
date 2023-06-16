@@ -26,9 +26,9 @@ class PreviewFragment : Fragment(R.layout.fragment_preview) {
 
         binding = FragmentPreviewBinding.bind(view)
 
-        var resultItem = args.item
+        var resultItem = args.repositoryResponse
 
-        _binding.ownerIconView.load(resultItem.ownerIconUrl)
+        _binding.ownerIconView.load(resultItem.owner.avatarUrl)
         _binding.nameView.text = resultItem.name
         _binding.languageView.text = resultItem.language
         _binding.starsView.text = getString(R.string.stars_count, resultItem.stargazersCount)
