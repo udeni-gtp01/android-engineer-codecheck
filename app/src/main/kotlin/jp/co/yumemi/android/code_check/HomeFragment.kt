@@ -9,24 +9,46 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import dagger.hilt.android.AndroidEntryPoint
+import jp.co.yumemi.android.code_check.adapter.CustomAdapter
 import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
+import jp.co.yumemi.android.code_check.databinding.FragmentPreviewBinding
+import jp.co.yumemi.android.code_check.databinding.LayoutResultItemBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
+import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
+import java.util.Date
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
-
+@AndroidEntryPoint
+//class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment() {
+    private lateinit var binding: FragmentHomeBinding
+    private lateinit var viewModel: RepositoryViewModel
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentHomeBinding.inflate(inflater,container,false)
+        viewModel= ViewModelProvider(requireActivity())[RepositoryViewModel::class.java]
+        binding.repositoryVM2 =viewModel
+        binding.lifecycleOwner=this
+        return binding.root
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val binding = FragmentHomeBinding.bind(view)
+        //val binding = FragmentHomeBinding.bind(view)
 
-        val viewModel = RepositoryViewModelTemp(requireContext())
+       // val viewModel = RepositoryViewModelTemp(requireContext())
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
@@ -41,19 +63,28 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             .setOnEditorActionListener { editText, action, _ ->
                 if (action == EditorInfo.IME_ACTION_SEARCH) {
                     editText.text.toString().let {
-                        viewModel.searchResults(it).apply {
-                            adapter.submitList(this)
-                        }
+                        MainActivity.lastSearchDate = Date()
+                        viewModel.getRepositoryList(it)
+                       //     .apply {
+                       //     adapter.submitList(this)
+                      //  }
                     }
                     return@setOnEditorActionListener true
                 }
                 return@setOnEditorActionListener false
             }
 
+binding.recyclerView.adapter=adapter
+
         binding.recyclerView.also {
             it.layoutManager = layoutManager
             it.addItemDecoration(dividerItemDecoration)
             it.adapter = adapter
+        }
+        //viewModel.repositoryList.observe(viewLifecycleOwner){
+        viewModel.repositoryList.observe(requireActivity()) {
+            println("******************"+ it?.size)
+            adapter.submitList(it)
         }
     }
 
@@ -75,29 +106,4 @@ val diff_util = object : DiffUtil.ItemCallback<RepositoryItem>() {
 
 }
 
-class CustomAdapter(
-    private val itemClickListener: OnItemClickListener,
-) : ListAdapter<RepositoryItem, CustomAdapter.ViewHolder>(diff_util) {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-    interface OnItemClickListener {
-        fun itemClick(item: RepositoryItem)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val _view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.layout_result_item, parent, false)
-        return ViewHolder(_view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val resultItem = getItem(position)
-        (holder.itemView.findViewById<View>(R.id.repositoryNameView) as TextView).text =
-            resultItem.name
-
-        holder.itemView.setOnClickListener {
-            itemClickListener.itemClick(resultItem)
-        }
-    }
-}

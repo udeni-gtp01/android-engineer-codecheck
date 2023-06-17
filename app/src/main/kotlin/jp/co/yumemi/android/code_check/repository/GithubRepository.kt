@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.repository
 
+import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.model.ServerResponse
 import jp.co.yumemi.android.code_check.service.GithubApiService
 import kotlinx.coroutines.Dispatchers
@@ -8,17 +9,17 @@ import javax.inject.Inject
 
 class GithubRepository @Inject constructor(private val githubApiService: GithubApiService) {
 
-    suspend fun getRepositoriesFromDataSource():ServerResponse?{
+    suspend fun getRepositoryList(inputText: String):List<RepositoryItem>?{
         return withContext(Dispatchers.IO){
-            return@withContext getRepositoriesFromRemoteService()
+            return@withContext getGithubApiResponse(inputText)?.items
         }
     }
-    private suspend fun getRepositoriesFromRemoteService():ServerResponse?{
-        var repositories:ServerResponse?=null
-        val response=githubApiService.getRepositories()
+    private suspend fun getGithubApiResponse(inputText: String):ServerResponse?{
+        var serverResponse:ServerResponse?=null
+        val response=githubApiService.getRepositories(inputText)
         if (response.isSuccessful){
-            repositories=response.body()
+            serverResponse=response.body()
         }
-        return repositories
+        return serverResponse
     }
 }

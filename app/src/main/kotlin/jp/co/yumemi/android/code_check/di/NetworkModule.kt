@@ -46,7 +46,7 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideConverterFactory(): Converter.Factory {
-        return GsonConverterFactory.create();
+        return GsonConverterFactory.create()
     }
 
     @Singleton
