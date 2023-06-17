@@ -4,7 +4,6 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
-import jp.co.yumemi.android.code_check.MainActivity.Companion.lastSearchDate
 import jp.co.yumemi.android.code_check.databinding.FragmentPreviewBinding
 import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
 
@@ -36,12 +34,12 @@ class PreviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        Log.d("検索した日時", lastSearchDate.toString())
+
 
 
         viewModel= ViewModelProvider(this)[RepositoryViewModel::class.java]
         binding.repositoryVM=viewModel
-        binding.lifecycleOwner=this
+        binding.lifecycleOwner=viewLifecycleOwner
 
         viewModel.setRepository(args.repository)
 

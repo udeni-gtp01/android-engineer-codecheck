@@ -4,49 +4,38 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
-import androidx.databinding.DataBindingUtil
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.adapter.CustomAdapter
 import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
-import jp.co.yumemi.android.code_check.databinding.FragmentPreviewBinding
-import jp.co.yumemi.android.code_check.databinding.LayoutResultItemBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.view_model.RepositoryListViewModel
-import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
-import java.util.Date
 
 @AndroidEntryPoint
-//class HomeFragment : Fragment(R.layout.fragment_home) {
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var viewModel: RepositoryListViewModel
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater,container,false)
-        viewModel= ViewModelProvider(requireActivity())[RepositoryListViewModel::class.java]
-        binding.repositoryListVM =viewModel
-        binding.lifecycleOwner=this
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel = ViewModelProvider(this)[RepositoryListViewModel::class.java]
+        binding.repositoryListVM = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
@@ -57,54 +46,44 @@ class HomeFragment : Fragment() {
             }
         })
 
-        binding.searchInputText
-            .setOnEditorActionListener { editText, action, _ ->
-                if (action == EditorInfo.IME_ACTION_SEARCH) {
-                    editText.text.toString().let {
-                        MainActivity.lastSearchDate = Date()
-                        viewModel.getRepositoryList(it)
-                       //     .apply {
-                       //     adapter.submitList(this)
-                      //  }
-                    }
-                    return@setOnEditorActionListener true
-                }
-                return@setOnEditorActionListener false
-            }
+        binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
+            if (action == EditorInfo.IME_ACTION_SEARCH) {
 
-binding.recyclerView.adapter=adapter
+                val searchQuery = editText.text.toString()
+                if (searchQuery.isNotEmpty()) {
+                    viewModel.getRepositoryList(searchQuery)
+                } else {
+                    viewModel.clearRepositoryList()
+                    // display an error message when search query is empty
+                    Toast.makeText(
+                        requireContext(),
+                        "Please enter a GitHub repository name",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
 
         binding.recyclerView.also {
             it.layoutManager = layoutManager
             it.addItemDecoration(dividerItemDecoration)
             it.adapter = adapter
         }
-        //viewModel.repositoryList.observe(viewLifecycleOwner){
-        viewModel.repositoryList.observe(requireActivity()) {
+
+        viewModel.repositoryList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
     }
 
     fun gotoRepositoryFragment(repositoryItem: RepositoryItem) {
-        if (repositoryItem==null){
-            Log.d("検索した日時NULL", "NULL item")
-        }
-        Log.d("検索した日時", repositoryItem.name)
-        val action = HomeFragmentDirections
-            .actionHomeFragmentToPreviewFragment(repository = repositoryItem)
+        val action =
+            HomeFragmentDirections.actionHomeFragmentToPreviewFragment(repository = repositoryItem)
         findNavController().navigate(action)
     }
 }
 
-val diff_util = object : DiffUtil.ItemCallback<RepositoryItem>() {
-    override fun areItemsTheSame(oldItem: RepositoryItem, newItem: RepositoryItem): Boolean {
-        return oldItem.name == newItem.name
-    }
 
-    override fun areContentsTheSame(oldItem: RepositoryItem, newItem: RepositoryItem): Boolean {
-        return oldItem == newItem
-    }
-
-}
 
 

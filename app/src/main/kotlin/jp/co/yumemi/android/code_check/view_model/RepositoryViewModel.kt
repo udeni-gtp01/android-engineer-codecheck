@@ -6,10 +6,9 @@ import androidx.lifecycle.ViewModel
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 
 
-class RepositoryViewModel() : ViewModel() {
+class RepositoryViewModel : ViewModel() {
 
     private val _repository = MutableLiveData<RepositoryItem>(null)
-
     val repository: LiveData<RepositoryItem>
         get() = _repository
 

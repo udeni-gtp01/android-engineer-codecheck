@@ -9,27 +9,34 @@ import kotlinx.parcelize.Parcelize
  * This class captures the relevant information and properties returned by the server in response to HTTP request.
  */
 @Parcelize
-data class ServerResponse(
+data class GitHubResponse(
+
     val items: List<RepositoryItem>
+
 ) : Parcelable
+
 @Parcelize
 data class RepositoryItem(
-    @SerializedName("full_name")
-    val name: String,
+
+    @SerializedName("forks_count") val forksCount: Long,
+
+    val language: String?,
+
+    @SerializedName("full_name") val name: String,
+
+    @SerializedName("open_issues_count") val openIssuesCount: Long,
+
     val owner: Owner,
-    //val ownerIconUrl: String,
-    val language: String,
-    @SerializedName("stargazers_count")
-    val stargazersCount: Long,
-    @SerializedName("watchers_count")
-    val watchersCount: Long,
-    @SerializedName("forks_count")
-    val forksCount: Long,
-    @SerializedName("open_issues_count")
-    val openIssuesCount: Long,
+
+    @SerializedName("stargazers_count") val stargazersCount: Long,
+
+    @SerializedName("watchers_count") val watchersCount: Long,
+
 ) : Parcelable
+
 @Parcelize
 data class Owner(
-    @SerializedName("avatar_url")
-    val avatarUrl: String
+
+    @SerializedName("avatar_url") val avatarUrl: String
+
 ) : Parcelable
