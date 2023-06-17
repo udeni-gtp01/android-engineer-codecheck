@@ -4,6 +4,7 @@
 package jp.co.yumemi.android.code_check.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,7 @@ class PreviewFragment : Fragment() {
 
         // Set the repository data in the ViewModel.
         viewModel.setRepository(args.repository)
+        Log.d("udeni",args.repository.toString())
 
         // Observe changes in the repository data and load the owner's avatar using Glide.
         viewModel.repository.observe(viewLifecycleOwner) {

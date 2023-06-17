@@ -19,9 +19,9 @@
             android:id="@+id/searchBar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"
-            android:layout_margin="12dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="8dp"
+            android:layout_margin="@dimen/dp_12"
+            app:cardCornerRadius="@dimen/dp_12"
+            app:cardElevation="@dimen/dp_8"
             app:layout_constraintBottom_toTopOf="@id/recyclerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -51,7 +51,7 @@
                     android:hint="@string/searchInputText_hint"
                     android:imeOptions="actionSearch"
                     android:inputType="text"
-                    android:textSize="12sp" />
+                    android:textSize="@dimen/sp_12" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -61,6 +61,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:layout_margin="@dimen/dp_10"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
