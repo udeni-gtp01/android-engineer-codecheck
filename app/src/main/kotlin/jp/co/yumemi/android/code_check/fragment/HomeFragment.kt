@@ -21,6 +21,9 @@ import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.view_model.RepositoryListViewModel
 
+/**
+ * Fragment representing the home screen of the app where repository search and listing are performed.
+ */
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
@@ -34,10 +37,17 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Initialize the ViewModel
         viewModel = ViewModelProvider(this)[RepositoryListViewModel::class.java]
+
+        // Set the ViewModel for data binding.
         binding.repositoryListVM = viewModel
+
+        // Set the lifecycle owner for observing LiveData.
         binding.lifecycleOwner = viewLifecycleOwner
 
+        // Set up RecyclerView
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
             DividerItemDecoration(requireContext(), layoutManager.orientation)
@@ -46,7 +56,13 @@ class HomeFragment : Fragment() {
                 gotoRepositoryFragment(item)
             }
         })
+        binding.recyclerView.also {
+            it.layoutManager = layoutManager
+            it.addItemDecoration(dividerItemDecoration)
+            it.adapter = adapter
+        }
 
+        // Set up search functionality
         binding.searchInputText.setOnEditorActionListener { editText, action, _ ->
             if (action == EditorInfo.IME_ACTION_SEARCH) {
 
@@ -54,8 +70,8 @@ class HomeFragment : Fragment() {
                 if (searchQuery.isNotEmpty()) {
                     viewModel.getRepositoryList(searchQuery)
                 } else {
+                    // clear existing search result and display error message when search query is empty
                     viewModel.clearRepositoryList()
-                    // display an error message when search query is empty
                     Toast.makeText(
                         requireContext(),
                         R.string.info_empty_search,
@@ -67,17 +83,16 @@ class HomeFragment : Fragment() {
             return@setOnEditorActionListener false
         }
 
-        binding.recyclerView.also {
-            it.layoutManager = layoutManager
-            it.addItemDecoration(dividerItemDecoration)
-            it.adapter = adapter
-        }
-
+        // Observe search result and update the adapter
         viewModel.repositoryList.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
     }
 
+    /**
+     * Navigate to the [PreviewFragment] and pass the selected [repositoryItem] as an argument
+     * to view the repository details
+     */
     fun gotoRepositoryFragment(repositoryItem: RepositoryItem) {
         val action =
             HomeFragmentDirections.actionHomeFragmentToPreviewFragment(repository = repositoryItem)

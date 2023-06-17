@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * Represents the data model for GitHub API response.
- * This class captures the relevant information and properties returned by the server in response to HTTP request.
+ * This class captures the relevant information and properties returned by the GitHub API.
  */
 @Parcelize
 data class GitHubResponse(
@@ -15,6 +15,10 @@ data class GitHubResponse(
 
 ) : Parcelable
 
+/**
+ * Represents a repository in an array of items in the GitHub API response.
+ * It contains properties related to a repository, such as forks count, language, name, etc.
+ */
 @Parcelize
 data class RepositoryItem(
 
@@ -32,8 +36,12 @@ data class RepositoryItem(
 
     @SerializedName("watchers_count") val watchersCount: Long,
 
-) : Parcelable
+    ) : Parcelable
 
+/**
+ * Represents the owner of a repository.
+ * It contains properties related to the owner, such as avatar URL.
+ */
 @Parcelize
 data class Owner(
 

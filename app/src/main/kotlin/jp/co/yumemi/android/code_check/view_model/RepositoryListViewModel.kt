@@ -10,21 +10,50 @@ import jp.co.yumemi.android.code_check.repository.GithubRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel class for the repository list screen.
+ *
+ * This class handles the logic and data for displaying a list of repositories.
+ * It communicates with the [GithubRepository] to fetch the repository data.
+ *
+ * @property githubRepository The repository for fetching data from the GitHub API.
+ */
 @HiltViewModel
 class RepositoryListViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ) : ViewModel() {
 
+    // MutableLiveData to hold the list of repositories returned from GitHub API call
     private val _repositoryList = MutableLiveData<List<RepositoryItem>?>(null)
+
+    /**
+     * LiveData object representing the list of repositories.
+     * Observers can observe this property to get updates on the repository list.
+     */
     val repositoryList: LiveData<List<RepositoryItem>?>
         get() = _repositoryList
 
+    /**
+     * Fetches the list of repositories based on the provided input text.
+     *
+     * This function launches a coroutine in the viewModelScope to fetch the repository list
+     * asynchronously from the [GithubRepository]. The fetched list is then stored in the
+     * [_repositoryList] MutableLiveData, which triggers observers to update.
+     *
+     * @param inputText The text to search for repositories.
+     */
     fun getRepositoryList(inputText: String) {
         viewModelScope.launch {
             _repositoryList.value = githubRepository.searchRepositoryList(inputText)
         }
     }
 
+    /**
+     * Clears the repository list.
+     *
+     * This function sets the value of [_repositoryList] to null, effectively clearing the list.
+     * Observers will be notified of the change and can update accordingly.
+     */
     fun clearRepositoryList() {
         _repositoryList.value = null
     }

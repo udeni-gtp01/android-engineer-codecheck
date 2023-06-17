@@ -7,8 +7,18 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
 
+/**
+ * Service interface for the GitHub API.
+ */
 interface GithubApiService {
+
+    /**
+     * Searches repositories on GitHub based on the specified query.
+     *
+     * @param keyWord The search query.
+     * @return A [Response] containing the search results as [GitHubResponse].
+     */
     @Headers(Constant.HEADER_1)
     @GET(Constant.ENDPOINT_REPOSITORY)
-    suspend fun searchRepositories(@Query("q") q: String): Response<GitHubResponse>
+    suspend fun searchRepositories(@Query("q") keyWord: String): Response<GitHubResponse>
 }

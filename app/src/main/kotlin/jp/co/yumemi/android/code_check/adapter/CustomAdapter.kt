@@ -8,10 +8,25 @@ import androidx.recyclerview.widget.RecyclerView
 import jp.co.yumemi.android.code_check.databinding.LayoutResultItemBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 
+/**
+ * CustomAdapter is a RecyclerView adapter that displays a list of RepositoryItem objects.
+ * It handles the creation and binding of ViewHolders for efficient recycling and updates.
+ *
+ * @param itemClickListener The click listener for item interactions.
+ */
 class CustomAdapter(
     private val itemClickListener: OnItemClickListener,
 ) : ListAdapter<RepositoryItem, CustomAdapter.ViewHolder>(diff_util) {
+
+    /**
+     * Interface definition for a callback to be invoked when an item is clicked.
+     */
     interface OnItemClickListener {
+        /**
+         * Called when an item is clicked.
+         *
+         * @param item The clicked RepositoryItem object.
+         */
         fun itemClick(item: RepositoryItem)
     }
 
@@ -26,6 +41,11 @@ class CustomAdapter(
         holder.bind(repositoryItem)
     }
 
+    /**
+     * ViewHolder represents an item view in the RecyclerView.
+     *
+     * @param binding The layout binding for the item view.
+     */
     inner class ViewHolder(private val binding: LayoutResultItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
@@ -46,15 +66,13 @@ class CustomAdapter(
     companion object {
         val diff_util = object : DiffUtil.ItemCallback<RepositoryItem>() {
             override fun areItemsTheSame(
-                oldItem: RepositoryItem,
-                newItem: RepositoryItem
+                oldItem: RepositoryItem, newItem: RepositoryItem
             ): Boolean {
                 return oldItem.name == newItem.name
             }
 
             override fun areContentsTheSame(
-                oldItem: RepositoryItem,
-                newItem: RepositoryItem
+                oldItem: RepositoryItem, newItem: RepositoryItem
             ): Boolean {
                 return oldItem == newItem
             }

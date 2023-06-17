@@ -13,10 +13,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
-
+/**
+ * Dependency injection using Hilt module that provides network-related functions.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+
+    /**
+     * Provides an instance of OkHttpClient.
+     */
     @Singleton
     @Provides
     fun provideHttpClient(): OkHttpClient {
@@ -24,6 +30,9 @@ object NetworkModule {
         return okHttpClient.build()
     }
 
+    /**
+     * Provides an instance of Retrofit.
+     */
     @Singleton
     @Provides
     fun provideRetrofit(
@@ -37,24 +46,36 @@ object NetworkModule {
         return retrofit.build()
     }
 
+    /**
+     * Provides the base URL for the API.
+     */
     @Singleton
     @Provides
     fun provideBaseUrl(): String {
         return Constant.BASE_URL
     }
 
+    /**
+     * Provides an instance of GsonConverterFactory.
+     */
     @Singleton
     @Provides
     fun provideConverterFactory(): Converter.Factory {
         return GsonConverterFactory.create()
     }
 
+    /**
+     * Provides an instance of GithubApiService.
+     */
     @Singleton
     @Provides
     fun provideGithubApiService(retrofit: Retrofit): GithubApiService {
         return retrofit.create(GithubApiService::class.java)
     }
 
+    /**
+     * Provides an instance of GithubRepository.
+     */
     @Singleton
     @Provides
     fun provideGithubRepository(githubApiService: GithubApiService): GithubRepository {
