@@ -4,6 +4,7 @@
 package jp.co.yumemi.android.code_check
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
 import jp.co.yumemi.android.code_check.databinding.FragmentPreviewBinding
 import jp.co.yumemi.android.code_check.databinding.LayoutResultItemBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
+import jp.co.yumemi.android.code_check.view_model.RepositoryListViewModel
 import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
 import java.util.Date
 
@@ -31,24 +33,20 @@ import java.util.Date
 //class HomeFragment : Fragment(R.layout.fragment_home) {
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var viewModel: RepositoryViewModel
+    private lateinit var viewModel: RepositoryListViewModel
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater,container,false)
-        viewModel= ViewModelProvider(requireActivity())[RepositoryViewModel::class.java]
-        binding.repositoryVM2 =viewModel
+        viewModel= ViewModelProvider(requireActivity())[RepositoryListViewModel::class.java]
+        binding.repositoryListVM =viewModel
         binding.lifecycleOwner=this
         return binding.root
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        //val binding = FragmentHomeBinding.bind(view)
-
-       // val viewModel = RepositoryViewModelTemp(requireContext())
 
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
@@ -83,12 +81,15 @@ binding.recyclerView.adapter=adapter
         }
         //viewModel.repositoryList.observe(viewLifecycleOwner){
         viewModel.repositoryList.observe(requireActivity()) {
-            println("******************"+ it?.size)
             adapter.submitList(it)
         }
     }
 
     fun gotoRepositoryFragment(repositoryItem: RepositoryItem) {
+        if (repositoryItem==null){
+            Log.d("検索した日時NULL", "NULL item")
+        }
+        Log.d("検索した日時", repositoryItem.name)
         val action = HomeFragmentDirections
             .actionHomeFragmentToPreviewFragment(repository = repositoryItem)
         findNavController().navigate(action)
