@@ -1,7 +1,7 @@
 /*
  * Copyright © 2021 YUMEMI Inc. All rights reserved.
  */
-package jp.co.yumemi.android.code_check
+package jp.co.yumemi.android.code_check.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
+import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.adapter.CustomAdapter
 import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
@@ -57,7 +58,7 @@ class HomeFragment : Fragment() {
                     // display an error message when search query is empty
                     Toast.makeText(
                         requireContext(),
-                        "Please enter a GitHub repository name",
+                        R.string.info_empty_search,
                         Toast.LENGTH_SHORT
                     ).show()
                 }

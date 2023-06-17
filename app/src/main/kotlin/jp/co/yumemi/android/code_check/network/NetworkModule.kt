@@ -1,4 +1,4 @@
-package jp.co.yumemi.android.code_check.di
+package jp.co.yumemi.android.code_check.network
 
 import dagger.Module
 import dagger.Provides
