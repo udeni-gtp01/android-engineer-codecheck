@@ -13,14 +13,15 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.MainActivity.Companion.lastSearchDate
 import jp.co.yumemi.android.code_check.databinding.FragmentPreviewBinding
 import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
 
+@AndroidEntryPoint
 class PreviewFragment : Fragment() {
 
     private val args: PreviewFragmentArgs by navArgs()
-
     private lateinit var binding: FragmentPreviewBinding
     private lateinit var viewModel: RepositoryViewModel
     //private val _binding get() = binding!!
@@ -38,7 +39,7 @@ class PreviewFragment : Fragment() {
         Log.d("検索した日時", lastSearchDate.toString())
 
 
-        viewModel= ViewModelProvider(this)[RepositoryViewModel()::class.java]
+        viewModel= ViewModelProvider(this)[RepositoryViewModel::class.java]
         binding.repositoryVM=viewModel
         binding.lifecycleOwner=this
 
