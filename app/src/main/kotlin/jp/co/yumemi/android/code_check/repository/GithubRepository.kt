@@ -8,8 +8,8 @@ import javax.inject.Inject
 
 class GithubRepository @Inject constructor(private val githubApiService: GithubApiService) {
 
-    suspend fun getRepositoriesFromDataSource():ServerResponse{
-        withContext(Dispatchers.IO){
+    suspend fun getRepositoriesFromDataSource():ServerResponse?{
+        return withContext(Dispatchers.IO){
             return@withContext getRepositoriesFromRemoteService()
         }
     }
