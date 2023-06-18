@@ -9,14 +9,14 @@ import jp.co.yumemi.android.code_check.databinding.LayoutResultItemBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 
 /**
- * CustomAdapter is a RecyclerView adapter that displays a list of RepositoryItem objects.
+ * RepositoryAdapter is a RecyclerView adapter that displays a list of RepositoryItem objects.
  * It handles the creation and binding of ViewHolders for efficient recycling and updates.
  *
  * @param itemClickListener The click listener for item interactions.
  */
-class CustomAdapter(
+class RepositoryAdapter(
     private val itemClickListener: OnItemClickListener,
-) : ListAdapter<RepositoryItem, CustomAdapter.ViewHolder>(diff_util) {
+) : ListAdapter<RepositoryItem, RepositoryAdapter.ViewHolder>(diff_util) {
 
     /**
      * Interface definition for a callback to be invoked when an item is clicked.
