@@ -37,7 +37,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_20"
                 android:text="@{repositoryVM.repository.name}"
-                android:textColor="@color/black"
+                android:textColor="@color/primary"
                 android:textSize="@dimen/sp_20"
                 tools:text="JetBrains/kotlin" />
 
@@ -55,7 +55,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_10"
                 android:text="@{String.format(@string/written_language, repositoryVM.repository.language)}"
-                android:textColor="@color/black"
+                android:textColor="@color/primary"
                 android:textSize="@dimen/sp_18"
                 tools:text="Written in Kotlin" />
 
@@ -66,7 +66,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_10"
                 android:text="@{String.format(@string/stars_count, repositoryVM.repository.stargazersCount)}"
-                android:textColor="@color/black"
+                android:textColor="@color/primary"
                 android:textSize="@dimen/sp_18"
                 tools:text="38530 stars" />
 
@@ -77,7 +77,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_10"
                 android:text="@{String.format(@string/watchers_count, repositoryVM.repository.watchersCount)}"
-                android:textColor="@color/black"
+                android:textColor="@color/primary"
                 android:textSize="@dimen/sp_18"
                 tools:text="38530 watchers" />
 
@@ -88,7 +88,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_10"
                 android:text="@{String.format(@string/forks_count, repositoryVM.repository.forksCount)}"
-                android:textColor="@color/black"
+                android:textColor="@color/primary"
                 android:textSize="@dimen/sp_18"
                 tools:text="4675 forks" />
 
@@ -99,7 +99,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_10"
                 android:text="@{String.format(@string/open_issues_count, repositoryVM.repository.openIssuesCount)}"
-                android:textColor="@color/black"
+                android:textColor="@color/primary"
                 android:textSize="@dimen/sp_18"
                 tools:text="131 open issues" />
         </LinearLayout>
