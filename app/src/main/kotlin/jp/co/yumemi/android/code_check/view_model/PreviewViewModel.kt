@@ -8,7 +8,7 @@ import jp.co.yumemi.android.code_check.model.RepositoryItem
 /**
  * ViewModel class for managing repository data.
  */
-class RepositoryViewModel : ViewModel() {
+class PreviewViewModel : ViewModel() {
 
     // MutableLiveData to hold the currently selected repository
     private val _repository = MutableLiveData<RepositoryItem>(null)

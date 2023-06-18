@@ -4,7 +4,6 @@
 package jp.co.yumemi.android.code_check.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.databinding.FragmentPreviewBinding
-import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
+import jp.co.yumemi.android.code_check.view_model.PreviewViewModel
 
 /**
  * Fragment that displays a preview of a repository.
@@ -23,7 +22,7 @@ import jp.co.yumemi.android.code_check.view_model.RepositoryViewModel
 class PreviewFragment : Fragment() {
     private val args: PreviewFragmentArgs by navArgs()
     private lateinit var binding: FragmentPreviewBinding
-    private lateinit var viewModel: RepositoryViewModel
+    private lateinit var viewModel: PreviewViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -36,7 +35,7 @@ class PreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize the ViewModel
-        viewModel = ViewModelProvider(this)[RepositoryViewModel::class.java]
+        viewModel = ViewModelProvider(this)[PreviewViewModel::class.java]
 
         // Set the ViewModel for data binding.
         binding.repositoryVM = viewModel

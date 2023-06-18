@@ -19,7 +19,7 @@ import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.adapter.RepositoryAdapter
 import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.view_model.RepositoryListViewModel
+import jp.co.yumemi.android.code_check.view_model.HomeViewModel
 
 /**
  * Fragment representing the home screen of the app where repository search and listing are performed.
@@ -27,7 +27,7 @@ import jp.co.yumemi.android.code_check.view_model.RepositoryListViewModel
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var viewModel: RepositoryListViewModel
+    private lateinit var viewModel: HomeViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize the ViewModel
-        viewModel = ViewModelProvider(this)[RepositoryListViewModel::class.java]
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         // Set the ViewModel for data binding.
         binding.repositoryListVM = viewModel

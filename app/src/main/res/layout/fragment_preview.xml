@@ -6,7 +6,7 @@
 
         <variable
             name="repositoryVM"
-            type="jp.co.yumemi.android.code_check.view_model.RepositoryViewModel" />
+            type="jp.co.yumemi.android.code_check.view_model.PreviewViewModel" />
     </data>
 
     <ScrollView
