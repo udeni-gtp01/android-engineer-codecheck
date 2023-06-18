@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.adapter.CustomAdapter
+import jp.co.yumemi.android.code_check.adapter.RepositoryAdapter
 import jp.co.yumemi.android.code_check.databinding.FragmentHomeBinding
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.view_model.RepositoryListViewModel
@@ -51,7 +51,7 @@ class HomeFragment : Fragment() {
         val layoutManager = LinearLayoutManager(requireContext())
         val dividerItemDecoration =
             DividerItemDecoration(requireContext(), layoutManager.orientation)
-        val adapter = CustomAdapter(object : CustomAdapter.OnItemClickListener {
+        val adapter = RepositoryAdapter(object : RepositoryAdapter.OnItemClickListener {
             override fun itemClick(item: RepositoryItem) {
                 gotoRepositoryFragment(item)
             }
