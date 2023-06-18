@@ -20,6 +20,7 @@ class GithubRepository @Inject constructor(private val githubApiService: GithubA
      *
      * @param inputText The text used for searching repositories.
      * @return A list of repository items matching the search query, or null if the search failed.
+     * FIXME: When search requests are being made too frequently the return response is empty.
      */
     suspend fun searchRepositoryList(inputText: String): List<RepositoryItem>? {
         return withContext(Dispatchers.IO) {
