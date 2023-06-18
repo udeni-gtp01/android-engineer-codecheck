@@ -27,7 +27,6 @@
                 android:layout_marginRight="@dimen/dp_20"
                 android:layout_marginBottom="@dimen/dp_20"
                 android:contentDescription="@null"
-                android:src="@{repositoryVM.repository.owner.avatarUrl}"
                 tools:src="@drawable/jetbrains" />
 
             <TextView
@@ -36,6 +35,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/dp_20"
+                android:paddingLeft="@dimen/dp_20"
+                android:paddingRight="@dimen/dp_20"
                 android:text="@{repositoryVM.repository.name}"
                 android:textColor="@color/primary"
                 android:textSize="@dimen/sp_20"
