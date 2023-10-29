@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.ui.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,7 +11,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -27,11 +28,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.Owner
@@ -42,13 +45,18 @@ import jp.co.yumemi.android.code_check.view_model.HomeViewModel
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
+    onRepositoryItemClicked: () -> Unit,
     homeViewModel: HomeViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
     val repositoryList: List<RepositoryItem>? by homeViewModel.repositoryList.observeAsState(initial = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    Column {
+    Column(
+        modifier = modifier
+            .padding(horizontal = dimensionResource(id = R.dimen.dp_10))
+
+    ) {
         SearchSection(
             searchKeyword = homeViewModel.searchKeyword,
             onSearchKeywordChange = { homeViewModel.updateSearchKeyword(it) },
@@ -57,9 +65,16 @@ fun HomeScreen(
                 homeViewModel.getRepositoryList()
             },
             onClearSearchClicked = { homeViewModel.clearSearchKeyword() },
-            modifier = modifier
         )
-        repositoryList?.let { SearchResultSection(it) }
+        repositoryList?.let {
+            SearchResultSection(
+                repositoryList = it,
+                onRepositoryItemClicked = { selectedRepository ->
+                    homeViewModel.setSelectedRepository(selectedRepository)
+                    onRepositoryItemClicked()
+                },
+            )
+        }
     }
 }
 
@@ -81,7 +96,7 @@ fun SearchSection(
             }) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.searchIconDescription)
+                    contentDescription = stringResource(R.string.search_icon_description)
                 )
             }
         },
@@ -90,7 +105,7 @@ fun SearchSection(
                 IconButton(onClick = { onClearSearchClicked() }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.clearIconDescription)
+                        contentDescription = stringResource(R.string.clear_icon_description)
                     )
                 }
             }
@@ -108,32 +123,42 @@ fun SearchSection(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.dp_10))
     )
 }
 
 @Composable
 fun SearchResultSection(
     repositoryList: List<RepositoryItem>,
+    onRepositoryItemClicked: (RepositoryItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val listState = rememberLazyListState()
+//    val listState = rememberLazyListState()
     LazyColumn(
-        state = listState,
+//        state = listState,
         verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp_12)),
         contentPadding = WindowInsets.navigationBars.asPaddingValues(),
-        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
-
+//        modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
     ) {
-        items(repositoryList) {
-            ResultItem(it)
+        items(
+            items = repositoryList,
+            key = { repositoryItem ->
+                // Return a stable, unique key for the repository item
+                repositoryItem.id
+            }) {
+            ResultItem(githubRepository = it, onRepositoryItemClicked = onRepositoryItemClicked)
         }
     }
 }
 
 @Composable
-fun ResultItem(githubRepository: RepositoryItem) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+fun ResultItem(githubRepository: RepositoryItem, onRepositoryItemClicked: (RepositoryItem) -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .clickable { onRepositoryItemClicked(githubRepository) }
+    ) {
         Text(text = githubRepository.name)
     }
     Divider(thickness = dimensionResource(id = R.dimen.dp_1))
@@ -151,7 +176,8 @@ fun PreviewSearchSection() {
                 onClearSearchClicked = {}
             )
             var repository1 = RepositoryItem(
-                name = "result repo/repo",
+                id = "1",
+                name = "result repo 1/repo 1",
                 forksCount = 10,
                 language = "",
                 owner = Owner(avatarUrl = "url"),
@@ -160,7 +186,8 @@ fun PreviewSearchSection() {
                 openIssuesCount = 10
             )
             var repository2 = RepositoryItem(
-                name = "result repo/repo",
+                id = "2",
+                name = "result repo 2/repo 2",
                 forksCount = 10,
                 language = "",
                 owner = Owner(avatarUrl = "url"),
@@ -170,7 +197,7 @@ fun PreviewSearchSection() {
             )
             var result = listOf(repository1, repository2)
 
-            SearchResultSection(result)
+            SearchResultSection(result, {})
         }
     }
 }

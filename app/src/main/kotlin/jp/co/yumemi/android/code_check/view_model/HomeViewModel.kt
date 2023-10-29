@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.model.RepositoryItem
+import jp.co.yumemi.android.code_check.model.RepositoryPreviewUiState
 import jp.co.yumemi.android.code_check.repository.GithubRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -58,6 +59,10 @@ class HomeViewModel @Inject constructor(
 
     fun clearSearchKeyword() {
         searchKeyword = ""
+    }
+
+    fun setSelectedRepository(repositoryItem: RepositoryItem){
+        RepositoryPreviewUiState.setRepository(repositoryItem)
     }
 
     /**

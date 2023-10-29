@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.navigation
 
+import jp.co.yumemi.android.code_check.ui.view.PreviewScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -17,11 +18,24 @@ import jp.co.yumemi.android.code_check.ui.view.HomeScreen
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
         composable(route = GithubRepositoryList.route) {
-            HomeScreen(modifier = modifier)
+            HomeScreen(
+                modifier = modifier,
+                onRepositoryItemClicked = {
+                    navController.navigateSingleTopTo(GithubRepositoryPreview.route)
+                }
+            )
         }
+        composable(route = GithubRepositoryPreview.route) {
+            PreviewScreen(
+                modifier = modifier
+            )
+        }
+
     }
 }
-
+private fun NavHostController.navigateToRepositoryPreview(repositoryId: String) {
+    this.navigateSingleTopTo("${GithubRepositoryPreview.route}/$repositoryId")
+}
 
 // Extension function to navigate with single top behavior
 fun NavHostController.navigateSingleTopTo(route: String) =

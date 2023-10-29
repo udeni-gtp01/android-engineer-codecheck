@@ -22,6 +22,8 @@ data class GitHubResponse(
 @Parcelize
 data class RepositoryItem(
 
+    val id: String,
+
     @SerializedName("forks_count") val forksCount: Long,
 
     val language: String?,
