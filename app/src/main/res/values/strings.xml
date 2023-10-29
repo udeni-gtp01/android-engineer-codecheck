@@ -7,4 +7,6 @@
     <string name="watchers_count" translatable="false">"%d watchers"</string>
     <string name="forks_count" translatable="false">"%d forks"</string>
     <string name="open_issues_count" translatable="false">"%d open issues"</string>
+    <string name="searchIconDescription">Tap to search by entered keyword</string>
+    <string name="clearIconDescription">Tap to clear entered keyword</string>
 </resources>

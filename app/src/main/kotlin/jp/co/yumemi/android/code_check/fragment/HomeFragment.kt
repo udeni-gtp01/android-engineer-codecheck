@@ -68,7 +68,7 @@ class HomeFragment : Fragment() {
 
                 val searchQuery = editText.text.toString()
                 if (searchQuery.isNotEmpty()) {
-                    viewModel.getRepositoryList(searchQuery)
+//                    viewModel.getRepositoryList(searchQuery)
                 } else {
                     // clear existing search result and display error message when search query is empty
                     viewModel.clearRepositoryList()

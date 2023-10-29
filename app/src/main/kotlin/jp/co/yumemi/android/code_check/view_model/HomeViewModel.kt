@@ -1,5 +1,8 @@
 package jp.co.yumemi.android.code_check.view_model
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -30,8 +33,9 @@ class HomeViewModel @Inject constructor(
      * LiveData object representing the list of repositories.
      * Observers can observe this property to get updates on the repository list.
      */
-    val repositoryList: LiveData<List<RepositoryItem>?>
-        get() = _repositoryList
+    val repositoryList: LiveData<List<RepositoryItem>?> = _repositoryList
+
+    var searchKeyword by mutableStateOf("")
 
     /**
      * Fetches the list of repositories based on the provided input text.
@@ -42,10 +46,18 @@ class HomeViewModel @Inject constructor(
      *
      * @param inputText The text to search for repositories.
      */
-    fun getRepositoryList(inputText: String) {
+    fun getRepositoryList() {
         viewModelScope.launch {
-            _repositoryList.value = githubRepository.searchRepositoryList(inputText)
+            _repositoryList.value = githubRepository.searchRepositoryList(searchKeyword)
         }
+    }
+
+    fun updateSearchKeyword(keyword: String) {
+        searchKeyword = keyword
+    }
+
+    fun clearSearchKeyword() {
+        searchKeyword = ""
     }
 
     /**

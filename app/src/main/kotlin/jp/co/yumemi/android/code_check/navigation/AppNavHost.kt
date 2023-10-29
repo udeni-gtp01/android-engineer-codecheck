@@ -1,11 +1,12 @@
 package jp.co.yumemi.android.code_check.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import jp.co.yumemi.android.code_check.ui.view.GithubRepoListScreen
+import jp.co.yumemi.android.code_check.ui.view.HomeScreen
 
 /**
  * Composable function responsible for hosting the navigation flow of the app.
@@ -13,10 +14,10 @@ import jp.co.yumemi.android.code_check.ui.view.GithubRepoListScreen
  * @param navController The [NavHostController] used for navigation between screens.
  */
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
         composable(route = GithubRepositoryList.route) {
-            GithubRepoListScreen()
+            HomeScreen(modifier = modifier)
         }
     }
 }
@@ -36,6 +37,6 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         // reselecting the same item
         launchSingleTop = true
         // Restore state when reselecting a previously selected item
-        restoreState = false
+        restoreState = true
     }
 
