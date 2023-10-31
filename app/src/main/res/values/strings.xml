@@ -7,4 +7,7 @@
     <string name="watchers_count" translatable="false">"%d watchers"</string>
     <string name="forks_count" translatable="false">"%d forks"</string>
     <string name="open_issues_count" translatable="false">"%d open issues"</string>
+    <string name="search_icon_description" translatable="false">Tap to search by entered keyword</string>
+    <string name="clear_icon_description" translatable="false">Tap to clear entered keyword</string>
+    <string name="image_description" translatable="false">Github Repository owner\'s avartar</string>
 </resources>
