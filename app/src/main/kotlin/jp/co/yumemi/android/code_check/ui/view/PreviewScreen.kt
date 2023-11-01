@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.ui.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,14 +21,15 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.view_model.PreviewViewModel
+import jp.co.yumemi.android.code_check.view_model.SharedViewModel
 
 @Composable
 fun PreviewScreen(
-    previewViewModel: PreviewViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val repository: RepositoryItem? by previewViewModel.repository.observeAsState(null)
+    val repository: RepositoryItem? by sharedViewModel.repositoryItem.observeAsState(null)
+    Log.d("oyasumi", "preview-SharedViewModel hash code: ${System.identityHashCode(sharedViewModel)}")
 
     repository?.let {
         LazyColumn(

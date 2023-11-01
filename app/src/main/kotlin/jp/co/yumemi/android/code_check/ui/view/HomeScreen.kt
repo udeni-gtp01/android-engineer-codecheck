@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.ui.view
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,16 +41,18 @@ import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.ui.theme.GithubRepositoryAppTheme
-import jp.co.yumemi.android.code_check.view_model.HomeViewModel
+import jp.co.yumemi.android.code_check.view_model.SharedViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
     onRepositoryItemClicked: () -> Unit,
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    sharedViewModel: SharedViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val repositoryList: List<RepositoryItem>? by homeViewModel.repositoryList.observeAsState(initial = null)
+    Log.d("oyasumi", "SharedViewModel hash code: ${System.identityHashCode(sharedViewModel)}")
+
+    val repositoryList: List<RepositoryItem>? by sharedViewModel.repositoryList.observeAsState(initial = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
@@ -58,19 +61,19 @@ fun HomeScreen(
 
     ) {
         SearchSection(
-            searchKeyword = homeViewModel.searchKeyword,
-            onSearchKeywordChange = { homeViewModel.updateSearchKeyword(it) },
+            searchKeyword = sharedViewModel.searchKeyword,
+            onSearchKeywordChange = { sharedViewModel.updateSearchKeyword(it) },
             onSearchClicked = {
                 keyboardController?.hide()
-                homeViewModel.getRepositoryList()
+                sharedViewModel.getRepositoryList()
             },
-            onClearSearchClicked = { homeViewModel.clearSearchKeyword() },
+            onClearSearchClicked = { sharedViewModel.clearSearchKeyword() },
         )
         repositoryList?.let {
             SearchResultSection(
                 repositoryList = it,
                 onRepositoryItemClicked = { selectedRepository ->
-                    homeViewModel.setSelectedRepository(selectedRepository)
+                    sharedViewModel.setSelectedRepositoryItem(selectedRepository)
                     onRepositoryItemClicked()
                 },
             )

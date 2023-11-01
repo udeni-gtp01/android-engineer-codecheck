@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.model.RepositoryPreviewUiState
 import jp.co.yumemi.android.code_check.repository.GithubRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,7 +22,7 @@ import javax.inject.Inject
  * @property githubRepository The repository for fetching data from the GitHub API.
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(
+class SharedViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ) : ViewModel() {
 
@@ -35,6 +34,23 @@ class HomeViewModel @Inject constructor(
      * Observers can observe this property to get updates on the repository list.
      */
     val repositoryList: LiveData<List<RepositoryItem>?> = _repositoryList
+
+    // MutableLiveData to hold the currently selected repository
+    private val _repositoryItem = MutableLiveData<RepositoryItem>(null)
+
+    /**
+     * LiveData object representing repository.
+     * This property exposes the repository data to observers
+     */
+    val repositoryItem: LiveData<RepositoryItem> = _repositoryItem
+
+    /**
+     * Sets the selected repository.
+     * @param selectedRepository The repository to be set.
+     */
+    fun setRepository(selectedRepository: RepositoryItem) {
+        _repositoryItem.value = selectedRepository
+    }
 
     var searchKeyword by mutableStateOf("")
 
@@ -61,9 +77,12 @@ class HomeViewModel @Inject constructor(
         searchKeyword = ""
     }
 
-    fun setSelectedRepository(repositoryItem: RepositoryItem){
-        RepositoryPreviewUiState.setRepository(repositoryItem)
+    fun setSelectedRepositoryItem(selectedRepositoryItem: RepositoryItem){
+//        RepositoryPreviewUiState.setRepository(repositoryItem)
+        _repositoryItem.value = selectedRepositoryItem
+
     }
+
 
     /**
      * Clears the repository list.

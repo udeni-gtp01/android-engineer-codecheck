@@ -1,13 +1,15 @@
 package jp.co.yumemi.android.code_check.navigation
 
-import jp.co.yumemi.android.code_check.ui.view.PreviewScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import jp.co.yumemi.android.code_check.ui.view.HomeScreen
+import jp.co.yumemi.android.code_check.ui.view.PreviewScreen
+import jp.co.yumemi.android.code_check.view_model.SharedViewModel
 
 /**
  * Composable function responsible for hosting the navigation flow of the app.
@@ -16,23 +18,40 @@ import jp.co.yumemi.android.code_check.ui.view.HomeScreen
  */
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
+    val viewModel: SharedViewModel = hiltViewModel()
+
     NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
         composable(route = GithubRepositoryList.route) {
             HomeScreen(
-                modifier = modifier,
+                sharedViewModel = viewModel,
                 onRepositoryItemClicked = {
-                    navController.navigateSingleTopTo(GithubRepositoryPreview.route)
-                }
+                    navController.navigate(GithubRepositoryPreview.route)
+//                    navController.navigateSingleTopTo(GithubRepositoryPreview.route)
+                },
+                modifier = modifier,
             )
         }
         composable(route = GithubRepositoryPreview.route) {
             PreviewScreen(
+                sharedViewModel = viewModel,
                 modifier = modifier
             )
         }
-
+//        composable(
+//            route = GithubRepositoryPreview.route,
+//            arguments = GithubRepositoryPreview.arguments
+//        ) {
+//            val repositoryId = it.arguments?.getString(GithubRepositoryPreview.repositoryIdArg)
+//            if (repositoryId != null) {
+//                jp.co.yumemi.android.code_check.ui.view.PreviewScreen(
+//                    repositoryId = repositoryId,
+//                    modifier = modifier
+//                )
+//            }
+//        }
     }
 }
+
 private fun NavHostController.navigateToRepositoryPreview(repositoryId: String) {
     this.navigateSingleTopTo("${GithubRepositoryPreview.route}/$repositoryId")
 }
