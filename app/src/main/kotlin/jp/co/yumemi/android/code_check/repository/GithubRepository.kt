@@ -1,7 +1,7 @@
 package jp.co.yumemi.android.code_check.repository
 
 import jp.co.yumemi.android.code_check.model.GitHubResponse
-import jp.co.yumemi.android.code_check.model.RepositoryItem
+import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.service.GithubApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,10 +22,9 @@ class GithubRepository @Inject constructor(private val githubApiService: GithubA
      * @return A list of repository items matching the search query, or null if the search failed.
      * FIXME: When search requests are being made too frequently the return response is empty.
      */
-    suspend fun searchRepositoryList(inputText: String): List<RepositoryItem> {
+    suspend fun searchRepositoryList(inputText: String): ServerResult<GitHubResponse> {
         return withContext(Dispatchers.IO) {
-            val repositoryItems=getGithubApiResponse(inputText)?.items
-            return@withContext repositoryItems?: emptyList()
+            return@withContext getGithubApiResponse(inputText)
         }
     }
 
@@ -35,12 +34,17 @@ class GithubRepository @Inject constructor(private val githubApiService: GithubA
      * @param inputText The text used for searching repositories.
      * @return The GitHub API response, or null if the request failed.
      */
-    private suspend fun getGithubApiResponse(inputText: String): GitHubResponse? {
-        var gitHubResponse: GitHubResponse? = null
-        val response = githubApiService.searchRepositories(inputText)
-        if (response.isSuccessful) {
-            gitHubResponse = response.body()
+    private suspend fun getGithubApiResponse(inputText: String): ServerResult<GitHubResponse> {
+        return try {
+            var gitHubResponse: GitHubResponse? = null
+            val response = githubApiService.searchRepositories(inputText)
+            if (response.isSuccessful) {
+                ServerResult.Success(response.body() ?: GitHubResponse(emptyList()))
+            } else {
+                ServerResult.Error(response.errorBody().toString())
+            }
+        } catch (error: Exception) {
+            ServerResult.Error(error.localizedMessage)
         }
-        return gitHubResponse
     }
 }

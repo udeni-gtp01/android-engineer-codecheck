@@ -24,7 +24,7 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
     NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
         composable(route = GithubRepositoryList.route) {
             HomeScreen(
-                sharedViewModel = viewModel,
+                githubRepoViewModel = viewModel,
                 onRepositoryItemClicked = {
                     navController.navigateSingleTopTo(GithubRepositoryPreview.route)
                 },
@@ -33,15 +33,11 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         }
         composable(route = GithubRepositoryPreview.route) {
             PreviewScreen(
-                sharedViewModel = viewModel,
+                githubRepoViewModel = viewModel,
                 modifier = modifier
             )
         }
     }
-}
-
-private fun NavHostController.navigateToRepositoryPreview(repositoryId: String) {
-    this.navigateSingleTopTo("${GithubRepositoryPreview.route}/$repositoryId")
 }
 
 // Extension function to navigate with single top behavior
@@ -55,9 +51,9 @@ fun NavHostController.navigateSingleTopTo(route: String) =
             saveState = true
         }
         // Avoid multiple copies of the same destination when
-        // reselecting the same item
+        // re-selecting the same item
         launchSingleTop = true
-        // Restore state when reselecting a previously selected item
+        // Restore state when re-selecting a previously selected item
         restoreState = true
     }
 

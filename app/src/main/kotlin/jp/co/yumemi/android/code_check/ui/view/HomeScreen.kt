@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,50 +40,53 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.RepositoryItem
+import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
     onRepositoryItemClicked: () -> Unit,
-    sharedViewModel: GithubRepoViewModel,
+    githubRepoViewModel: GithubRepoViewModel,
     modifier: Modifier = Modifier
 ) {
-    val repositoryList: List<RepositoryItem>? by sharedViewModel.repositoryList.observeAsState(
-        initial = null
-    )
+    val serverResult by githubRepoViewModel.serverResult.observeAsState(initial = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
         modifier = modifier
             .padding(dimensionResource(id = R.dimen.dp_10))
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .padding(
-                    top = dimensionResource(id = R.dimen.dp_10),
-                    bottom = dimensionResource(id = R.dimen.dp_10)
+        when (serverResult) {
+            is ServerResult.Loading -> {
+                LoadingScreen()
+            }
+
+            is ServerResult.Error -> {
+                val errorMessage = (serverResult as ServerResult.Error).message
+                ErrorScreen(
+                    errorMessage = errorMessage,
+                    onRetryButtonClicked = { githubRepoViewModel.searchRepositoryList() })
+            }
+
+            else -> {
+                SearchSection(
+                    searchKeyword = githubRepoViewModel.searchKeyword,
+                    onSearchKeywordChange = { githubRepoViewModel.updateSearchKeyword(it) },
+                    onSearchClicked = {
+                        keyboardController?.hide()
+                        githubRepoViewModel.searchRepositoryList()
+                    },
+                    onClearButtonClicked = { githubRepoViewModel.clearSearchKeyword() },
                 )
-        ) {
-            SearchSection(
-                searchKeyword = sharedViewModel.searchKeyword,
-                onSearchKeywordChange = { sharedViewModel.updateSearchKeyword(it) },
-                onSearchClicked = {
-                    keyboardController?.hide()
-                    sharedViewModel.getRepositoryList()
-                },
-                onClearButtonClicked = { sharedViewModel.clearSearchKeyword() },
-            )
-        }
-        repositoryList?.let {
-            SearchResultSection(
-                repositoryList = it,
-                onRepositoryItemClicked = { selectedRepository ->
-                    sharedViewModel.setSelectedRepositoryItem(selectedRepository)
-                    onRepositoryItemClicked()
-                },
-            )
+                SearchResultSection(
+                    repositoryList = githubRepoViewModel.getRepositoryList(),
+                    onRepositoryItemClicked = { selectedRepository ->
+                        githubRepoViewModel.setSelectedRepositoryItem(selectedRepository)
+                        onRepositoryItemClicked()
+                    },
+                )
+            }
         }
     }
 }
@@ -95,32 +99,41 @@ fun SearchSection(
     onClearButtonClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    OutlinedTextField(
-        value = searchKeyword,
-        singleLine = true,
-        onValueChange = onSearchKeywordChange,
-        leadingIcon = {
-            SearchButton(onSearchClicked = onSearchClicked)
-        },
-        trailingIcon = {
-            if (searchKeyword.isNotBlank()) {
-                ClearButton(onClearButtonClicked = onClearButtonClicked)
-            }
-        },
-        label = {
-            Text(text = stringResource(R.string.searchInputText_hint))
-        },
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = {
-                onSearchClicked()
-            }
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-    )
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .padding(
+                top = dimensionResource(id = R.dimen.dp_10),
+                bottom = dimensionResource(id = R.dimen.dp_10)
+            )
+    ) {
+        OutlinedTextField(
+            value = searchKeyword,
+            singleLine = true,
+            onValueChange = onSearchKeywordChange,
+            leadingIcon = {
+                SearchButton(onSearchClicked = onSearchClicked)
+            },
+            trailingIcon = {
+                if (searchKeyword.isNotBlank()) {
+                    ClearButton(onClearButtonClicked = onClearButtonClicked)
+                }
+            },
+            label = {
+                Text(text = stringResource(R.string.searchInputText_hint))
+            },
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearchClicked()
+                }
+            ),
+            modifier = modifier
+                .fillMaxWidth()
+        )
+    }
 }
 
 @Composable
@@ -148,25 +161,37 @@ fun SearchResultSection(
     repositoryList: List<RepositoryItem>,
     onRepositoryItemClicked: (RepositoryItem) -> Unit,
 ) {
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp_12)),
-        contentPadding = PaddingValues(
-            top = dimensionResource(id = R.dimen.dp_12),
-            bottom = dimensionResource(id = R.dimen.dp_12)
-        )
-    ) {
-        items(
-            items = repositoryList,
-            key = { repositoryItem ->
-                // Return a stable, unique key for the repository item
-                repositoryItem.id
-            }) {
-            RepositoryListItem(
-                githubRepository = it,
-                onRepositoryItemClicked = onRepositoryItemClicked
+    if (repositoryList.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = stringResource(id = R.string.no_result))
+        }
+    } else {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp_12)),
+            contentPadding = PaddingValues(
+                top = dimensionResource(id = R.dimen.dp_12),
+                bottom = dimensionResource(id = R.dimen.dp_12)
             )
+        ) {
+            items(
+                items = repositoryList,
+                key = { repositoryItem ->
+                    // Return a stable, unique key for the repository item
+                    repositoryItem.id
+                }) {
+                RepositoryListItem(
+                    githubRepository = it,
+                    onRepositoryItemClicked = onRepositoryItemClicked
+                )
+            }
         }
     }
+
 }
 
 @Composable

@@ -8,7 +8,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.RepositoryItem
+import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.repository.GithubRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,14 +28,7 @@ class GithubRepoViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ) : ViewModel() {
 
-    // MutableLiveData to hold the list of repositories returned from GitHub API call
-    private val _repositoryList = MutableLiveData<List<RepositoryItem>?>(null)
-
-    /**
-     * LiveData object representing the list of repositories.
-     * Observers can observe this property to get updates on the repository list.
-     */
-    val repositoryList: LiveData<List<RepositoryItem>?> = _repositoryList
+    private var repositoryList: List<RepositoryItem> = emptyList()
 
     // MutableLiveData to hold the currently selected repository
     private val _repositoryItem = MutableLiveData<RepositoryItem>(null)
@@ -43,6 +38,9 @@ class GithubRepoViewModel @Inject constructor(
      * This property exposes the repository data to observers
      */
     val repositoryItem: LiveData<RepositoryItem> = _repositoryItem
+
+    private val _serverResult = MutableLiveData<ServerResult<GitHubResponse>>()
+    val serverResult: LiveData<ServerResult<GitHubResponse>> = _serverResult
 
     /**
      * Sets the selected repository.
@@ -63,10 +61,26 @@ class GithubRepoViewModel @Inject constructor(
      *
      * @param inputText The text to search for repositories.
      */
-    fun getRepositoryList() {
+    fun searchRepositoryList() {
+        _serverResult.value = ServerResult.Loading
         viewModelScope.launch {
-            _repositoryList.value = githubRepository.searchRepositoryList(searchKeyword)
+            val serverResult: ServerResult<GitHubResponse> =
+                githubRepository.searchRepositoryList(searchKeyword)
+            _serverResult.value = serverResult
+            when (serverResult) {
+                is ServerResult.Success -> {
+                    repositoryList = serverResult.data.items
+                }
+
+                else -> {
+                    repositoryList = emptyList()
+                }
+            }
         }
+    }
+
+    fun getRepositoryList(): List<RepositoryItem> {
+        return repositoryList
     }
 
     fun updateSearchKeyword(keyword: String) {
@@ -77,7 +91,7 @@ class GithubRepoViewModel @Inject constructor(
         searchKeyword = ""
     }
 
-    fun setSelectedRepositoryItem(selectedRepositoryItem: RepositoryItem){
+    fun setSelectedRepositoryItem(selectedRepositoryItem: RepositoryItem) {
 //        RepositoryPreviewUiState.setRepository(repositoryItem)
         _repositoryItem.value = selectedRepositoryItem
 
@@ -91,6 +105,6 @@ class GithubRepoViewModel @Inject constructor(
      * Observers will be notified of the change and can update accordingly.
      */
     fun clearRepositoryList() {
-        _repositoryList.value = null
+        repositoryList = emptyList()
     }
 }

@@ -24,11 +24,11 @@ import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
 @Composable
 fun PreviewScreen(
-    sharedViewModel: GithubRepoViewModel,
+    githubRepoViewModel: GithubRepoViewModel,
     modifier: Modifier = Modifier
 ) {
-    val repository: RepositoryItem? by sharedViewModel.repositoryItem.observeAsState(null)
-    Log.d("oyasumi", "preview-GithubRepoViewModel hash code: ${System.identityHashCode(sharedViewModel)}")
+    val repository: RepositoryItem? by githubRepoViewModel.repositoryItem.observeAsState(null)
+    Log.d("oyasumi", "preview-GithubRepoViewModel hash code: ${System.identityHashCode(githubRepoViewModel)}")
 
     repository?.let {
         LazyColumn(
