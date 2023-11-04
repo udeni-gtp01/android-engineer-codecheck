@@ -1,7 +1,7 @@
 /*
  * Copyright © 2021 YUMEMI Inc. All rights reserved.
  */
-package jp.co.yumemi.android.code_check.activity
+package jp.co.yumemi.android.code_check.ui.view
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,7 +15,6 @@ import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jp.co.yumemi.android.code_check.navigation.AppNavHost
 import jp.co.yumemi.android.code_check.ui.theme.GithubRepositoryAppTheme
-import jp.co.yumemi.android.code_check.ui.view.GithubRepoAppTopAppBar
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

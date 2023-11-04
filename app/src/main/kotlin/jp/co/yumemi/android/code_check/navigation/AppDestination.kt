@@ -17,12 +17,3 @@ object GithubRepositoryList : AppDestination {
 object GithubRepositoryPreview : AppDestination {
     override val route = "repo_preview"
 }
-
-//object GithubRepositoryPreview : AppDestination {
-//    override val route = "repo_preview"
-//    const val repositoryIdArg = "repository_item"
-//    val routeWithArgs = "$route/{$repositoryIdArg}"
-//    val arguments = listOf(
-//        navArgument(repositoryIdArg) { type = NavType.StringType }
-//    )
-//}

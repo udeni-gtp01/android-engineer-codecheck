@@ -22,7 +22,7 @@ import javax.inject.Inject
  * @property githubRepository The repository for fetching data from the GitHub API.
  */
 @HiltViewModel
-class SharedViewModel @Inject constructor(
+class GithubRepoViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ) : ViewModel() {
 

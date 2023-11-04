@@ -2,12 +2,17 @@
     <string name="app_name" translatable="false">Android Engineer CodeCheck</string>
     <string name="searchInputText_hint" translatable="false">GitHub のリポジトリを検索できるよー</string>
     <string name="info_empty_search">Please enter a GitHub repository name</string>
+    <string name="language_summary" translatable="false">" %s"</string>
+    <string name="watchers_summary" translatable="false">" %s"</string>
+    <string name="star_summary" translatable="false">" %d"</string>
     <string name="written_language" translatable="false">Written in %s</string>
-    <string name="stars_count" translatable="false">"%d stars"</string>
-    <string name="watchers_count" translatable="false">"%d watchers"</string>
-    <string name="forks_count" translatable="false">"%d forks"</string>
-    <string name="open_issues_count" translatable="false">"%d open issues"</string>
-    <string name="search_icon_description" translatable="false">Tap to search by entered keyword</string>
+    <string name="stars_count" translatable="false">%d stars</string>
+    <string name="watchers_count" translatable="false">%d watchers</string>
+    <string name="forks_count" translatable="false">%d forks</string>
+    <string name="open_issues_count" translatable="false">%d open issues</string>
+    <string name="search_icon_description" translatable="false">Tap to search by entered keyword
+    </string>
     <string name="clear_icon_description" translatable="false">Tap to clear entered keyword</string>
-    <string name="image_description" translatable="false">Github Repository owner\'s avartar</string>
+    <string name="image_description" translatable="false">Github Repository owner\'s avatar</string>
+    <string name="by" translatable="false">"by "</string>
 </resources>

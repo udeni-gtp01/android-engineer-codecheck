@@ -15,21 +15,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.view_model.SharedViewModel
+import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
 @Composable
 fun PreviewScreen(
-    sharedViewModel: SharedViewModel = hiltViewModel(),
+    sharedViewModel: GithubRepoViewModel,
     modifier: Modifier = Modifier
 ) {
     val repository: RepositoryItem? by sharedViewModel.repositoryItem.observeAsState(null)
-    Log.d("oyasumi", "preview-SharedViewModel hash code: ${System.identityHashCode(sharedViewModel)}")
+    Log.d("oyasumi", "preview-GithubRepoViewModel hash code: ${System.identityHashCode(sharedViewModel)}")
 
     repository?.let {
         LazyColumn(

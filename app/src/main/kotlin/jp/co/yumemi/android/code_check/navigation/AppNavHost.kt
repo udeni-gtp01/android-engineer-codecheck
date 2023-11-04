@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import jp.co.yumemi.android.code_check.ui.view.HomeScreen
 import jp.co.yumemi.android.code_check.ui.view.PreviewScreen
-import jp.co.yumemi.android.code_check.view_model.SharedViewModel
+import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
 /**
  * Composable function responsible for hosting the navigation flow of the app.
@@ -18,15 +18,15 @@ import jp.co.yumemi.android.code_check.view_model.SharedViewModel
  */
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    val viewModel: SharedViewModel = hiltViewModel()
+
+    val viewModel: GithubRepoViewModel = hiltViewModel()
 
     NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
         composable(route = GithubRepositoryList.route) {
             HomeScreen(
                 sharedViewModel = viewModel,
                 onRepositoryItemClicked = {
-                    navController.navigate(GithubRepositoryPreview.route)
-//                    navController.navigateSingleTopTo(GithubRepositoryPreview.route)
+                    navController.navigateSingleTopTo(GithubRepositoryPreview.route)
                 },
                 modifier = modifier,
             )
@@ -37,18 +37,6 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                 modifier = modifier
             )
         }
-//        composable(
-//            route = GithubRepositoryPreview.route,
-//            arguments = GithubRepositoryPreview.arguments
-//        ) {
-//            val repositoryId = it.arguments?.getString(GithubRepositoryPreview.repositoryIdArg)
-//            if (repositoryId != null) {
-//                jp.co.yumemi.android.code_check.ui.view.PreviewScreen(
-//                    repositoryId = repositoryId,
-//                    modifier = modifier
-//                )
-//            }
-//        }
     }
 }
 
