@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.co.yumemi.android.code_check.constant.Constant
 import jp.co.yumemi.android.code_check.repository.GithubRepository
+import jp.co.yumemi.android.code_check.repository.GithubRepositoryImpl
 import jp.co.yumemi.android.code_check.service.GithubApiService
 import okhttp3.OkHttpClient
 import retrofit2.Converter
@@ -79,6 +80,6 @@ object NetworkModule {
     @Singleton
     @Provides
     fun provideGithubRepository(githubApiService: GithubApiService): GithubRepository {
-        return GithubRepository(githubApiService)
+        return GithubRepositoryImpl(githubApiService)
     }
 }

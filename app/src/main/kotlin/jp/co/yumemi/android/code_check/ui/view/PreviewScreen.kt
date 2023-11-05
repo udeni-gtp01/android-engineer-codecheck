@@ -1,5 +1,6 @@
 package jp.co.yumemi.android.code_check.ui.view
 
+import android.util.Log
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,20 +15,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.view_model.PreviewViewModel
+import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
 @Composable
 fun PreviewScreen(
-    previewViewModel: PreviewViewModel = hiltViewModel(),
+    githubRepoViewModel: GithubRepoViewModel,
     modifier: Modifier = Modifier
 ) {
-    val repository: RepositoryItem? by previewViewModel.repository.observeAsState(null)
+    val repository: RepositoryItem? by githubRepoViewModel.repositoryItem.observeAsState(null)
+    Log.d("oyasumi", "preview-GithubRepoViewModel hash code: ${System.identityHashCode(githubRepoViewModel)}")
 
     repository?.let {
         LazyColumn(

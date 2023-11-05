@@ -1,46 +1,19 @@
 package jp.co.yumemi.android.code_check.repository
 
 import jp.co.yumemi.android.code_check.model.GitHubResponse
-import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.service.GithubApiService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import jp.co.yumemi.android.code_check.model.ServerResult
 
 /**
- * Repository class responsible for interacting with the GitHub API and fetching repository data.
- * It provides a method to search for repository items based on the provided input text.
- *
- * @param githubApiService The service responsible for making API requests to the GitHub API.
+ * Interface for searching GitHub repositories.
  */
-class GithubRepository @Inject constructor(private val githubApiService: GithubApiService) {
-
+interface GithubRepository {
     /**
      * Searches for repository items based on the provided input text.
      *
      * @param inputText The text used for searching repositories.
-     * @return A list of repository items matching the search query, or null if the search failed.
-     * FIXME: When search requests are being made too frequently the return response is empty.
+     * @return A [ServerResult] containing the result of the search operation. If successful,
+     * it returns a list of [GitHubResponse] items matching the search query. If the search fails,
+     * it returns an appropriate error or network-related result.
      */
-    suspend fun searchRepositoryList(inputText: String): List<RepositoryItem> {
-        return withContext(Dispatchers.IO) {
-            val repositoryItems=getGithubApiResponse(inputText)?.items
-            return@withContext repositoryItems?: emptyList()
-        }
-    }
-
-    /**
-     * Fetches the GitHub API response for the provided input text.
-     *
-     * @param inputText The text used for searching repositories.
-     * @return The GitHub API response, or null if the request failed.
-     */
-    private suspend fun getGithubApiResponse(inputText: String): GitHubResponse? {
-        var gitHubResponse: GitHubResponse? = null
-        val response = githubApiService.searchRepositories(inputText)
-        if (response.isSuccessful) {
-            gitHubResponse = response.body()
-        }
-        return gitHubResponse
-    }
+    suspend fun searchRepositoryList(inputText: String): ServerResult<GitHubResponse>
 }
