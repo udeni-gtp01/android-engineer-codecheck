@@ -5,6 +5,7 @@ import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.service.GithubApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -36,15 +37,18 @@ class GithubRepository @Inject constructor(private val githubApiService: GithubA
      */
     private suspend fun getGithubApiResponse(inputText: String): ServerResult<GitHubResponse> {
         return try {
-            var gitHubResponse: GitHubResponse? = null
             val response = githubApiService.searchRepositories(inputText)
             if (response.isSuccessful) {
                 ServerResult.Success(response.body() ?: GitHubResponse(emptyList()))
             } else {
-                ServerResult.Error(response.errorBody().toString())
+                ServerResult.ProcessingError(response.errorBody().toString())
             }
+        } catch (error: IOException) {
+            // Handle network connection issues, e.g., no internet connection
+            ServerResult.NetworkError(error.localizedMessage)
+
         } catch (error: Exception) {
-            ServerResult.Error(error.localizedMessage)
+            ServerResult.ProcessingError(error.localizedMessage)
         }
     }
 }

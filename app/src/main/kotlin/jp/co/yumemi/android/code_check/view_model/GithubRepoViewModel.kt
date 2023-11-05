@@ -27,20 +27,56 @@ import javax.inject.Inject
 class GithubRepoViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ) : ViewModel() {
+    private val _serverResult = MutableLiveData<ServerResult<GitHubResponse>>()
+    val serverResult: LiveData<ServerResult<GitHubResponse>> = _serverResult
 
     private var repositoryList: List<RepositoryItem> = emptyList()
 
     // MutableLiveData to hold the currently selected repository
     private val _repositoryItem = MutableLiveData<RepositoryItem>(null)
-
-    /**
-     * LiveData object representing repository.
-     * This property exposes the repository data to observers
-     */
     val repositoryItem: LiveData<RepositoryItem> = _repositoryItem
 
-    private val _serverResult = MutableLiveData<ServerResult<GitHubResponse>>()
-    val serverResult: LiveData<ServerResult<GitHubResponse>> = _serverResult
+    var searchKeyword by mutableStateOf("")
+
+
+    /**
+     * Fetches the list of repositories based on the provided input text.
+     *
+     * This function launches a coroutine in the viewModelScope to fetch the repository list
+     * asynchronously from the [GithubRepository]. The fetched list is then stored in the
+     * [repositoryList] MutableLiveData, which triggers observers to update.
+     *
+     */
+    fun searchRepositoryList() {
+        if (searchKeyword.isBlank()) {
+            ServerResult.Success(GitHubResponse(emptyList()))
+            repositoryList = emptyList()
+        } else {
+            setServerResult(ServerResult.Loading)
+            viewModelScope.launch {
+                val serverResult: ServerResult<GitHubResponse> =
+                    githubRepository.searchRepositoryList(searchKeyword)
+                setServerResult(serverResult)
+            }
+        }
+    }
+
+    private fun setServerResult(serverResult: ServerResult<GitHubResponse>) {
+        _serverResult.value = serverResult
+        repositoryList = when (serverResult) {
+            is ServerResult.Success -> {
+                serverResult.data.items
+            }
+
+            else -> {
+                emptyList()
+            }
+        }
+    }
+
+    fun getRepositoryList(): List<RepositoryItem> {
+        return repositoryList
+    }
 
     /**
      * Sets the selected repository.
@@ -50,61 +86,11 @@ class GithubRepoViewModel @Inject constructor(
         _repositoryItem.value = selectedRepository
     }
 
-    var searchKeyword by mutableStateOf("")
-
-    /**
-     * Fetches the list of repositories based on the provided input text.
-     *
-     * This function launches a coroutine in the viewModelScope to fetch the repository list
-     * asynchronously from the [GithubRepository]. The fetched list is then stored in the
-     * [_repositoryList] MutableLiveData, which triggers observers to update.
-     *
-     * @param inputText The text to search for repositories.
-     */
-    fun searchRepositoryList() {
-        _serverResult.value = ServerResult.Loading
-        viewModelScope.launch {
-            val serverResult: ServerResult<GitHubResponse> =
-                githubRepository.searchRepositoryList(searchKeyword)
-            _serverResult.value = serverResult
-            when (serverResult) {
-                is ServerResult.Success -> {
-                    repositoryList = serverResult.data.items
-                }
-
-                else -> {
-                    repositoryList = emptyList()
-                }
-            }
-        }
-    }
-
-    fun getRepositoryList(): List<RepositoryItem> {
-        return repositoryList
-    }
-
     fun updateSearchKeyword(keyword: String) {
         searchKeyword = keyword
     }
 
     fun clearSearchKeyword() {
         searchKeyword = ""
-    }
-
-    fun setSelectedRepositoryItem(selectedRepositoryItem: RepositoryItem) {
-//        RepositoryPreviewUiState.setRepository(repositoryItem)
-        _repositoryItem.value = selectedRepositoryItem
-
-    }
-
-
-    /**
-     * Clears the repository list.
-     *
-     * This function sets the value of [_repositoryList] to null, effectively clearing the list.
-     * Observers will be notified of the change and can update accordingly.
-     */
-    fun clearRepositoryList() {
-        repositoryList = emptyList()
     }
 }

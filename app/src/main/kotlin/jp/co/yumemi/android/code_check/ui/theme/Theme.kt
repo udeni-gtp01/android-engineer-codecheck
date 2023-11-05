@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import jp.co.yumemi.android.code_check.repository.GithubRepository
 
 private val DarkColorScheme = darkColorScheme(
     primary = md_theme_dark_primary,

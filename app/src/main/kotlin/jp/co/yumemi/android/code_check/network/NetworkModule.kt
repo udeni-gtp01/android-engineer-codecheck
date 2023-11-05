@@ -74,7 +74,7 @@ object NetworkModule {
     }
 
     /**
-     * Provides an instance of GithubRepository.
+     * Provides an instance of GithubRepositoryImpl.
      */
     @Singleton
     @Provides

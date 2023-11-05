@@ -33,6 +33,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -57,32 +58,40 @@ fun HomeScreen(
         modifier = modifier
             .padding(dimensionResource(id = R.dimen.dp_10))
     ) {
+        SearchSection(
+            searchKeyword = githubRepoViewModel.searchKeyword,
+            onSearchKeywordChange = { githubRepoViewModel.updateSearchKeyword(it) },
+            onSearchClicked = {
+                keyboardController?.hide()
+                githubRepoViewModel.searchRepositoryList()
+            },
+            onClearButtonClicked = { githubRepoViewModel.clearSearchKeyword() },
+        )
+
         when (serverResult) {
             is ServerResult.Loading -> {
                 LoadingScreen()
             }
 
-            is ServerResult.Error -> {
-                val errorMessage = (serverResult as ServerResult.Error).message
+            is ServerResult.ProcessingError -> {
                 ErrorScreen(
-                    errorMessage = errorMessage,
+                    errorTitle = stringResource(id = R.string.oh_no),
+                    errorMessage = stringResource(id = R.string.invalid_request),
+                    onRetryButtonClicked = { githubRepoViewModel.searchRepositoryList() })
+            }
+
+            is ServerResult.NetworkError -> {
+                ErrorScreen(
+                    errorTitle = stringResource(id = R.string.oh_no),
+                    errorMessage = stringResource(id = R.string.no_internet),
                     onRetryButtonClicked = { githubRepoViewModel.searchRepositoryList() })
             }
 
             else -> {
-                SearchSection(
-                    searchKeyword = githubRepoViewModel.searchKeyword,
-                    onSearchKeywordChange = { githubRepoViewModel.updateSearchKeyword(it) },
-                    onSearchClicked = {
-                        keyboardController?.hide()
-                        githubRepoViewModel.searchRepositoryList()
-                    },
-                    onClearButtonClicked = { githubRepoViewModel.clearSearchKeyword() },
-                )
                 SearchResultSection(
                     repositoryList = githubRepoViewModel.getRepositoryList(),
                     onRepositoryItemClicked = { selectedRepository ->
-                        githubRepoViewModel.setSelectedRepositoryItem(selectedRepository)
+                        githubRepoViewModel.setRepository(selectedRepository)
                         onRepositoryItemClicked()
                     },
                 )
@@ -132,13 +141,17 @@ fun SearchSection(
             ),
             modifier = modifier
                 .fillMaxWidth()
+                .then(Modifier.testTag("SearchTextField"))
         )
     }
 }
 
 @Composable
 fun SearchButton(onSearchClicked: () -> Unit) {
-    IconButton(onClick = { onSearchClicked() }) {
+    IconButton(
+        onClick = { onSearchClicked() },
+        modifier = Modifier.testTag("SearchButton")
+    ) {
         Icon(
             imageVector = Icons.Default.Search,
             contentDescription = stringResource(R.string.search_icon_description)
@@ -148,7 +161,10 @@ fun SearchButton(onSearchClicked: () -> Unit) {
 
 @Composable
 fun ClearButton(onClearButtonClicked: () -> Unit) {
-    IconButton(onClick = { onClearButtonClicked() }) {
+    IconButton(
+        onClick = { onClearButtonClicked() },
+        modifier = Modifier.testTag("ClearButton")
+    ) {
         Icon(
             imageVector = Icons.Default.Clear,
             contentDescription = stringResource(R.string.clear_icon_description)
@@ -163,8 +179,7 @@ fun SearchResultSection(
 ) {
     if (repositoryList.isEmpty()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

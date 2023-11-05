@@ -36,7 +36,9 @@ data class RepositoryItem(
 
     @SerializedName("stargazers_count") val stargazersCount: Long,
 
-    @SerializedName("watchers_count") val watchersCount: Long
+    @SerializedName("watchers_count") val watchersCount: Long,
+
+    @SerializedName("html_url") val htmlUrl: String
 
 ) : Parcelable
 

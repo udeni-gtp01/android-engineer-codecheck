@@ -5,11 +5,11 @@
     <string name="language_summary" translatable="false">" %s"</string>
     <string name="watchers_summary" translatable="false">" %s"</string>
     <string name="star_summary" translatable="false">" %d"</string>
-    <string name="written_language" translatable="false">Written in %s</string>
-    <string name="stars_count" translatable="false">%d stars</string>
-    <string name="watchers_count" translatable="false">%d watchers</string>
-    <string name="forks_count" translatable="false">%d forks</string>
-    <string name="open_issues_count" translatable="false">%d open issues</string>
+    <string name="written_language" translatable="false">Written in</string>
+    <string name="stars_count" translatable="false">Stars</string>
+    <string name="watchers_count" translatable="false">Watchers</string>
+    <string name="forks_count" translatable="false">Forks</string>
+    <string name="open_issues_count" translatable="false">Open issues</string>
     <string name="search_icon_description" translatable="false">Tap to search by entered keyword
     </string>
     <string name="clear_icon_description" translatable="false">Tap to clear entered keyword</string>
@@ -17,5 +17,13 @@
     <string name="by" translatable="false">"by "</string>
     <string name="retry" translatable="false">Retry</string>
     <string name="no_result" translatable="false">No Results</string>
+    <string name="oh_no" translatable="false">Oh no!</string>
+    <string name="no_internet" translatable="false">No Internet found. Check your connection or try
+        again.
+    </string>
+    <string name="invalid_request" translatable="false">Error occurred. Check entered repository
+        name or try again.
+    </string>
     <string name="loading" translatable="false">Loading</string>
+    <string name="go_to_repository" translatable="false">Go to Repository</string>
 </resources>
