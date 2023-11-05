@@ -10,13 +10,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
-import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.repository.GithubRepository
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 import org.junit.Assert
@@ -25,13 +22,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnitRunner
 
-@RunWith(AndroidJUnit4::class)
-//@ExperimentalTestApi
-//@SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-//@RunWith(MockitoJUnitRunner::class)
+/**
+ * Test class for the HomeScreen composable.
+ */
+@RunWith(MockitoJUnitRunner::class)
 class HomeScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -39,29 +36,24 @@ class HomeScreenTest {
     @Mock
     private lateinit var githubRepository: GithubRepository
 
-    //
-//    @Mock
-    lateinit var viewModel: GithubRepoViewModel
-//
-//    @Mock
-//    lateinit var repositoryItemObserver: Observer<RepositoryItem>
-//
-//    @Mock
-//    lateinit var serverResultObserver: Observer<ServerResult<GitHubResponse>>
+    private lateinit var viewModel: GithubRepoViewModel
 
-    @Before
-    fun setUp() {
-        MockitoAnnotations.initMocks(this)
-        viewModel = GithubRepoViewModel(githubRepository)
-//        viewModel.repositoryItem.observeForever(repositoryItemObserver)
-//        viewModel.serverResult.observeForever(serverResultObserver)
-    }
-
+    // CompositionLocal to provide the search keyword in the Composable
     private val LocalSearchKeyword =
         compositionLocalOf<Any> { error("No search keyword provided") }
 
     private val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
+    @Before
+    fun setUp() {
+        MockitoAnnotations.initMocks(this)
+        viewModel = GithubRepoViewModel(githubRepository)
+    }
+
+
+    /**
+     * Test to verify entering a valid keyword in the search text field.
+     */
     @Test
     fun enterValidKeywordInSearchTextField() {
         val searchKeyword = "repo"
@@ -82,6 +74,9 @@ class HomeScreenTest {
         searchField.assert(hasText(searchKeyword))
     }
 
+    /**
+     * Test to verify that the Clear Button clears the search field and ViewModel searchKeyword.
+     */
     @Test
     fun testClearButton_emptySearchField() {
         val searchKeyword = "repo"
@@ -116,6 +111,9 @@ class HomeScreenTest {
         searchField.assert(hasText(""))
     }
 
+    /**
+     * Test to verify empty search field results in an empty result message.
+     */
     @Test
     fun emptySearchField_emptyResultDisplayed() {
         composeTestRule.setContent {
@@ -131,7 +129,6 @@ class HomeScreenTest {
         // Verify that the search field is initially empty
         searchField.assert(hasText(""))
 
-        // Tap the search button
         searchButton.performClick()
         composeTestRule.waitForIdle()
         composeTestRule
@@ -139,20 +136,23 @@ class HomeScreenTest {
             .assertIsDisplayed()
     }
 
+    /**
+     * Test to verify the SearchResultSection displays the correct repository items.
+     */
     @Test
     fun testSearchResultSection() {
-        var repository1 = RepositoryItem(
+        val repository1 = RepositoryItem(
             id = "1",
             name = "repo 1",
             forksCount = 10,
-            language = "",
+            language = "language",
             owner = Owner(login = "name", avatarUrl = "url"),
             stargazersCount = 10,
             watchersCount = 10,
             openIssuesCount = 10,
             htmlUrl = "htmlurl"
         )
-        var repository2 = RepositoryItem(
+        val repository2 = RepositoryItem(
             id = "2",
             name = "repo 2",
             forksCount = 10,
@@ -163,7 +163,7 @@ class HomeScreenTest {
             openIssuesCount = 10,
             htmlUrl = "htmlurl"
         )
-        var repoListResult = listOf(repository1, repository2)
+        val repoListResult = listOf(repository1, repository2)
         composeTestRule.setContent {
             CompositionLocalProvider(LocalSearchKeyword provides repoListResult) {
                 SearchResultSection(

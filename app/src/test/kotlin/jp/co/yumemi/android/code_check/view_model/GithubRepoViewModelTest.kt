@@ -7,7 +7,7 @@ import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.model.ServerResult
-import jp.co.yumemi.android.code_check.repository.GithubRepositoryImpl
+import jp.co.yumemi.android.code_check.repository.GithubRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -32,7 +32,7 @@ class GithubRepoViewModelTest {
     private lateinit var viewModel: GithubRepoViewModel
 
     @Mock
-    private lateinit var githubRepository: GithubRepositoryImpl
+    private lateinit var githubRepository: GithubRepository
 
     @Mock
     lateinit var repositoryItemObserver: Observer<RepositoryItem>
@@ -67,7 +67,7 @@ class GithubRepoViewModelTest {
     @Test
     fun `provided valid keyword should update the repository list`() =
         runTest {// Uses Main’s scheduler
-            var repository1 = RepositoryItem(
+            val repository1 = RepositoryItem(
                 id = "1",
                 name = "result repo 1/repo 1",
                 forksCount = 10,
@@ -78,7 +78,7 @@ class GithubRepoViewModelTest {
                 openIssuesCount = 10,
                 htmlUrl = "htmlurl"
             )
-            var repository2 = RepositoryItem(
+            val repository2 = RepositoryItem(
                 id = "2",
                 name = "result repo 2/repo 2",
                 forksCount = 10,
@@ -89,9 +89,8 @@ class GithubRepoViewModelTest {
                 openIssuesCount = 10,
                 htmlUrl = "htmlurl"
             )
-            var repoListResult = listOf(repository1, repository2)
+            val repoListResult = listOf(repository1, repository2)
 
-            val expectedRepoListResult = repoListResult
             val keyword = "repo"
 
             // Mock the behavior of githubRepository.searchRepositoryList
@@ -100,7 +99,7 @@ class GithubRepoViewModelTest {
 
             viewModel.searchKeyword = keyword
             viewModel.searchRepositoryList()
-            assertEquals(expectedRepoListResult, viewModel.getRepositoryList())
+            assertEquals(repoListResult, viewModel.getRepositoryList())
         }
 
     @Test
@@ -121,11 +120,11 @@ class GithubRepoViewModelTest {
 
     @Test
     fun `test setRepository`() {
-        var repositoryItem = RepositoryItem(
+        val repositoryItem = RepositoryItem(
             id = "1",
             name = "result repo 1/repo 1",
             forksCount = 10,
-            language = "",
+            language = "language",
             owner = Owner(login = "name", avatarUrl = "url"),
             stargazersCount = 10,
             watchersCount = 10,

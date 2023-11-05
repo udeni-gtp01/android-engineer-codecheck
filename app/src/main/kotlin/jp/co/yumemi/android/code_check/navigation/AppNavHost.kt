@@ -15,12 +15,14 @@ import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
  * Composable function responsible for hosting the navigation flow of the app.
  *
  * @param navController The [NavHostController] used for navigation between screens.
+ * @param modifier Additional modifier to be applied to the [NavHost].
  */
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-
+    // Create an instance of the ViewModel
     val viewModel: GithubRepoViewModel = hiltViewModel()
 
+    // Define the navigation flow using a NavHost
     NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
         composable(route = GithubRepositoryList.route) {
             HomeScreen(
@@ -40,7 +42,12 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
     }
 }
 
-// Extension function to navigate with single top behavior
+/**
+ * Extension function to navigate with a single top behavior. It navigates to the specified route
+ * while ensuring that multiple copies of the same destination are not added to the back stack.
+ *
+ * @param route The route to navigate to.
+ */
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) { // Pop up to the start destination of the graph to
         // avoid building up a large stack of destinations

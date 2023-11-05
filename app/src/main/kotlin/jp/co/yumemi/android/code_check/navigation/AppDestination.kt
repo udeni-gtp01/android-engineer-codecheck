@@ -1,8 +1,8 @@
 package jp.co.yumemi.android.code_check.navigation
 
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
-
+/**
+ * An interface that represents a navigation destination in the app.
+ */
 interface AppDestination {
     /**
      * The route associated with the destination.
@@ -10,10 +10,16 @@ interface AppDestination {
     val route: String
 }
 
+/**
+ * An object representing the GitHub Repository List destination.
+ */
 object GithubRepositoryList : AppDestination {
     override val route = "repo_list"
 }
 
+/**
+ * An object representing the GitHub Repository Preview destination.
+ */
 object GithubRepositoryPreview : AppDestination {
     override val route = "repo_preview"
 }

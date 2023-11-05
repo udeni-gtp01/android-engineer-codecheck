@@ -16,41 +16,35 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel class for the repository list screen.
+ * View Model for the GitHub Repository search feature.
  *
- * This class handles the logic and data for displaying a list of repositories.
- * It communicates with the [GithubRepository] to fetch the repository data.
- *
- * @property githubRepository The repository for fetching data from the GitHub API.
+ * @property githubRepository Repository responsible for fetching GitHub data.
  */
 @HiltViewModel
 class GithubRepoViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ) : ViewModel() {
+
+    // LiveData to observe server results
     private val _serverResult = MutableLiveData<ServerResult<GitHubResponse>>()
     val serverResult: LiveData<ServerResult<GitHubResponse>> = _serverResult
 
+    // List of GitHub repository items
     private var repositoryList: List<RepositoryItem> = emptyList()
 
-    // MutableLiveData to hold the currently selected repository
+    // LiveData for observing the currently selected repository item
     private val _repositoryItem = MutableLiveData<RepositoryItem>(null)
     val repositoryItem: LiveData<RepositoryItem> = _repositoryItem
 
+    // Mutable state for the search keyword entered by the user
     var searchKeyword by mutableStateOf("")
 
-
     /**
-     * Fetches the list of repositories based on the provided input text.
-     *
-     * This function launches a coroutine in the viewModelScope to fetch the repository list
-     * asynchronously from the [GithubRepository]. The fetched list is then stored in the
-     * [repositoryList] MutableLiveData, which triggers observers to update.
-     *
+     * Search for GitHub repositories based on the current search keyword.
      */
     fun searchRepositoryList() {
         if (searchKeyword.isBlank()) {
-            ServerResult.Success(GitHubResponse(emptyList()))
-            repositoryList = emptyList()
+            setServerResult(ServerResult.Success(GitHubResponse(emptyList())))
         } else {
             setServerResult(ServerResult.Loading)
             viewModelScope.launch {
@@ -61,6 +55,11 @@ class GithubRepoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Set the server result and update the list of repository items based on the result.
+     *
+     * @param serverResult The result of the GitHub repository search.
+     */
     private fun setServerResult(serverResult: ServerResult<GitHubResponse>) {
         _serverResult.value = serverResult
         repositoryList = when (serverResult) {
@@ -74,22 +73,36 @@ class GithubRepoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Get the list of GitHub repository items.
+     *
+     * @return List of repository items.
+     */
     fun getRepositoryList(): List<RepositoryItem> {
         return repositoryList
     }
 
     /**
-     * Sets the selected repository.
-     * @param selectedRepository The repository to be set.
+     * Set the currently selected repository item.
+     *
+     * @param selectedRepository The selected GitHub repository.
      */
     fun setRepository(selectedRepository: RepositoryItem) {
         _repositoryItem.value = selectedRepository
     }
 
+    /**
+     * Update the search keyword with the given value.
+     *
+     * @param keyword The search keyword entered by the user.
+     */
     fun updateSearchKeyword(keyword: String) {
         searchKeyword = keyword
     }
 
+    /**
+     * Clear the search keyword.
+     */
     fun clearSearchKeyword() {
         searchKeyword = ""
     }
