@@ -33,7 +33,7 @@ import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
  * Composable that displays a preview of a repository.
  *
  * @param githubRepoViewModel The ViewModel providing repository information.
- * @param modifier The modifier for this composable.
+ * @param modifier Modifier for customizing the layout.
  */
 @Composable
 fun PreviewScreen(
