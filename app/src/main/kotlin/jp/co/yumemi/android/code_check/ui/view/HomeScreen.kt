@@ -44,6 +44,13 @@ import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
+/**
+ * Composable function representing the main screen of the app.
+ *
+ * @param onRepositoryItemClicked Callback function when a repository item is clicked.
+ * @param githubRepoViewModel The ViewModel for managing data and interactions.
+ * @param modifier Modifier for customizing the layout.
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
@@ -100,6 +107,15 @@ fun HomeScreen(
     }
 }
 
+/**
+ * Composable function for the search field section of the main screen.
+ *
+ * @param searchKeyword The search keyword.
+ * @param onSearchKeywordChange Callback function for changes in the search keyword.
+ * @param onSearchClicked Callback function for the search button click.
+ * @param onClearButtonClicked Callback function for the clear button click.
+ * @param modifier Modifier for customizing the layout.
+ */
 @Composable
 fun SearchSection(
     searchKeyword: String,
@@ -146,6 +162,11 @@ fun SearchSection(
     }
 }
 
+/**
+ * Composable function for the search button.
+ *
+ * @param onSearchClicked Callback function for the search button click.
+ */
 @Composable
 fun SearchButton(onSearchClicked: () -> Unit) {
     IconButton(
@@ -159,6 +180,11 @@ fun SearchButton(onSearchClicked: () -> Unit) {
     }
 }
 
+/**
+ * Composable function for the clear button.
+ *
+ * @param onClearButtonClicked Callback function for the clear button click.
+ */
 @Composable
 fun ClearButton(onClearButtonClicked: () -> Unit) {
     IconButton(
@@ -172,6 +198,12 @@ fun ClearButton(onClearButtonClicked: () -> Unit) {
     }
 }
 
+/**
+ * Composable function for displaying the repository list search result.
+ *
+ * @param repositoryList List of repository items.
+ * @param onRepositoryItemClicked Callback function when a single repository list item is clicked.
+ */
 @Composable
 fun SearchResultSection(
     repositoryList: List<RepositoryItem>,
@@ -206,9 +238,14 @@ fun SearchResultSection(
             }
         }
     }
-
 }
 
+/**
+ * Composable function for displaying a single repository item.
+ *
+ * @param githubRepository The repository item to display.
+ * @param onRepositoryItemClicked Callback function when this item is clicked.
+ */
 @Composable
 fun RepositoryListItem(
     githubRepository: RepositoryItem,
@@ -250,6 +287,11 @@ fun RepositoryListItem(
     }
 }
 
+/**
+ * Composable function for displaying the repository name.
+ *
+ * @param name The name of the repository.
+ */
 @Composable
 fun RepositoryName(name: String) {
     Text(
@@ -259,6 +301,11 @@ fun RepositoryName(name: String) {
     )
 }
 
+/**
+ * Composable function for displaying the owner section.
+ *
+ * @param owner The owner's name of the repository.
+ */
 @Composable
 fun OwnerSection(owner: String) {
     Row(
@@ -276,6 +323,13 @@ fun OwnerSection(owner: String) {
     }
 }
 
+/**
+ * Composable function for displaying language and statistics section.
+ *
+ * @param language The programming language used in the repository.
+ * @param watchersCount The number of watchers for the repository.
+ * @param stargazersCount The number of stargazers for the repository.
+ */
 @Composable
 fun LanguageAndStatisticsSection(
     language: String?,
@@ -303,9 +357,8 @@ fun LanguageAndStatisticsSection(
                         stringResource(R.string.language_summary),
                         it,
                     ),
-                    style = MaterialTheme.typography.bodySmall,
-
-                    )
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
         Row(
