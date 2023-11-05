@@ -22,11 +22,13 @@ data class GitHubResponse(
 @Parcelize
 data class RepositoryItem(
 
+    val id: String,
+
     @SerializedName("forks_count") val forksCount: Long,
 
     val language: String?,
 
-    @SerializedName("full_name") val name: String,
+    @SerializedName("name") val name: String,
 
     @SerializedName("open_issues_count") val openIssuesCount: Long,
 
@@ -36,7 +38,9 @@ data class RepositoryItem(
 
     @SerializedName("watchers_count") val watchersCount: Long,
 
-    ) : Parcelable
+    @SerializedName("html_url") val htmlUrl: String
+
+) : Parcelable
 
 /**
  * Represents the owner of a repository.
@@ -44,6 +48,8 @@ data class RepositoryItem(
  */
 @Parcelize
 data class Owner(
+
+    @SerializedName("login") val login: String,
 
     @SerializedName("avatar_url") val avatarUrl: String
 
