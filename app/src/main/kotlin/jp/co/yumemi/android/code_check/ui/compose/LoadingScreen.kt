@@ -23,36 +23,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import jp.co.yumemi.android.code_check.R
 
+/**
+ * A composable function for displaying a loading screen with a circular loading animation.
+ */
 @Composable
-fun LoadingScreen(
-    modifier: Modifier = Modifier
-
-) {
+fun LoadingScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoadingAnimation() // Circular progress indicator
+        LoadingAnimation()
     }
 }
 
+/**
+ * A composable function for displaying a circular loading animation.
+ *
+ * @param indicatorSize The size of the circular loading animation.
+ * @param circleColors The list of colors to use for the circular loading animation.
+ * @param animationDuration The duration of the loading animation in milliseconds.
+ */
 @Composable
 fun LoadingAnimation(
     indicatorSize: Dp = dimensionResource(id = R.dimen.dp_50),
     circleColors: List<Color> = listOf(
         MaterialTheme.colorScheme.primary,
         MaterialTheme.colorScheme.onPrimary,
-//        MaterialTheme.colorScheme.tertiary,
     ),
     animationDuration: Int = 360
 ) {
 
-    val infiniteTransition = rememberInfiniteTransition(label = "loading")
+    val infiniteTransition =
+        rememberInfiniteTransition(label = stringResource(id = R.string.loading))
 
     val rotateAnimation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -76,6 +82,6 @@ fun LoadingAnimation(
             ),
         progress = 1f,
         strokeWidth = dimensionResource(id = R.dimen.dp_1),
-        color = MaterialTheme.colorScheme.background // Set background color
+        color = MaterialTheme.colorScheme.background
     )
 }

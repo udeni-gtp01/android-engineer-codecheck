@@ -19,6 +19,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import jp.co.yumemi.android.code_check.R
 
+/**
+ * Composable function for displaying an error screen with a title, error message, and retry button.
+ *
+ * @param errorTitle The title of the error message.
+ * @param errorMessage The detailed error message.
+ * @param onRetryButtonClicked Callback to handle the retry button click.
+ */
 @Composable
 fun ErrorScreen(
     errorTitle: String,
@@ -39,6 +46,14 @@ fun ErrorScreen(
     }
 }
 
+/**
+ * Composable function for rendering the content of the error screen, including the title,
+ * error message, and a retry button.
+ *
+ * @param errorTitle The title of the error message.
+ * @param errorMessage The detailed error message.
+ * @param onRetryButtonClicked Callback to handle the retry button click.
+ */
 @Composable
 fun LoadErrorSection(
     errorTitle: String,
@@ -72,6 +87,9 @@ fun LoadErrorSection(
     }
 }
 
+/**
+ * Preview function for the ErrorScreen composable, used for Compose UI preview.
+ */
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewErrorScreen() {
