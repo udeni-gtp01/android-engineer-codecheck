@@ -15,6 +15,9 @@ import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.repository.GithubRepository
+import jp.co.yumemi.android.code_check.ui.compose.HomeScreen
+import jp.co.yumemi.android.code_check.ui.compose.SearchResultSection
+import jp.co.yumemi.android.code_check.ui.compose.SearchSection
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 import org.junit.Assert
 import org.junit.Before

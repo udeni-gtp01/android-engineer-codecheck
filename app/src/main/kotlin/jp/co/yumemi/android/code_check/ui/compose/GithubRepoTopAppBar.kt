@@ -1,4 +1,4 @@
-package jp.co.yumemi.android.code_check.ui.view
+package jp.co.yumemi.android.code_check.ui.compose
 
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api

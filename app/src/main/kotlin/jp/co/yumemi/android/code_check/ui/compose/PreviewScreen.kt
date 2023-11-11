@@ -1,4 +1,4 @@
-package jp.co.yumemi.android.code_check.ui.view
+package jp.co.yumemi.android.code_check.ui.compose
 
 import android.content.Intent
 import android.net.Uri

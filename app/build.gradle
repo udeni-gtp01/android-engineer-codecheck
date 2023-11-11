@@ -49,7 +49,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
-    implementation 'io.coil-kt:coil-compose:2.4.0'
+    implementation 'io.coil-kt:coil-compose:2.5.0'
     implementation 'androidx.activity:activity-compose:1.8.0'
     implementation 'androidx.compose.runtime:runtime'
     implementation 'androidx.compose.ui:ui'
@@ -68,9 +68,9 @@ dependencies {
     ksp 'com.google.dagger:hilt-android-compiler:2.48.1'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
-    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.mockito:mockito-core:5.7.0'
     testImplementation 'androidx.arch.core:core-testing:2.2.0'
 
     androidTestImplementation(composeBom)
@@ -81,7 +81,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'androidx.compose.ui:ui-test'
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
-    androidTestImplementation 'org.mockito:mockito-android:3.10.0'
+    androidTestImplementation 'org.mockito:mockito-android:5.7.0'
 
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 }
