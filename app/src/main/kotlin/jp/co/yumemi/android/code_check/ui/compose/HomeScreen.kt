@@ -1,4 +1,4 @@
-package jp.co.yumemi.android.code_check.ui.view
+package jp.co.yumemi.android.code_check.ui.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
@@ -225,12 +226,7 @@ fun SearchResultSection(
                 bottom = dimensionResource(id = R.dimen.dp_12)
             )
         ) {
-            items(
-                items = repositoryList,
-                key = { repositoryItem ->
-                    // Return a stable, unique key for the repository item
-                    repositoryItem.id
-                }) {
+            items(items = repositoryList) {
                 RepositoryListItem(
                     githubRepository = it,
                     onRepositoryItemClicked = onRepositoryItemClicked
@@ -269,8 +265,8 @@ fun RepositoryListItem(
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.dp_10))
         ) {
-            RepositoryName(githubRepository.name)
-            OwnerSection(githubRepository.owner.login)
+            RepositoryNameSection(githubRepository.name)
+            OwnerSection(githubRepository.owner)
             Divider(
                 thickness = dimensionResource(id = R.dimen.dp_1),
                 modifier = Modifier.padding(
@@ -290,24 +286,27 @@ fun RepositoryListItem(
 /**
  * Composable function for displaying the repository name.
  *
- * @param name The name of the repository.
+ * @param name The name of the repository. If null, nothing is displayed.
  */
 @Composable
-fun RepositoryName(name: String) {
-    Text(
-        text = name,
-        style = MaterialTheme.typography.bodyLarge,
-        fontWeight = FontWeight.Bold
-    )
+fun RepositoryNameSection(name: String?) {
+    name?.let {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("ResultRepoName")
+        )
+    }
 }
 
 /**
  * Composable function for displaying the owner section.
  *
- * @param owner The owner's name of the repository.
+ * @param owner The owner of the repository. If null, a default null value is displayed.
  */
 @Composable
-fun OwnerSection(owner: String) {
+fun OwnerSection(owner: Owner?) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -317,8 +316,9 @@ fun OwnerSection(owner: String) {
             color = MaterialTheme.colorScheme.outline
         )
         Text(
-            text = owner,
+            text = owner?.login ?: stringResource(R.string.null_value),
             style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.testTag("ResultOwnerName")
         )
     }
 }
@@ -326,41 +326,43 @@ fun OwnerSection(owner: String) {
 /**
  * Composable function for displaying language and statistics section.
  *
- * @param language The programming language used in the repository.
- * @param watchersCount The number of watchers for the repository.
- * @param stargazersCount The number of stargazers for the repository.
+ * @param language The programming language used in the repository. If null, a default null value is displayed.
+ * @param watchersCount The number of watchers for the repository. If null, a default null value is displayed.
+ * @param stargazersCount The number of stargazers for the repository. If null, a default null value is displayed.
  */
 @Composable
 fun LanguageAndStatisticsSection(
     language: String?,
-    watchersCount: Long,
-    stargazersCount: Long
+    watchersCount: Long?,
+    stargazersCount: Long?
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        language?.let {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val languagePainter: Painter = painterResource(id = R.drawable.outline_code)
-                Icon(
-                    painter = languagePainter,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
-                )
-                Text(
-                    text = String.format(
-                        stringResource(R.string.language_summary),
-                        it,
-                    ),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+        // Section for the language used in the repository
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val languagePainter: Painter = painterResource(id = R.drawable.outline_code)
+            Icon(
+                painter = languagePainter,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
+            )
+            Text(
+                text = String.format(
+                    stringResource(R.string.language_summary),
+                    language ?: stringResource(R.string.null_value)
+                ),
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.testTag("ResultLanguage")
+            )
         }
+
+        // Section for the number of watchers
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -374,11 +376,14 @@ fun LanguageAndStatisticsSection(
             Text(
                 text = String.format(
                     stringResource(R.string.watchers_summary),
-                    watchersCount,
+                    watchersCount ?: stringResource(R.string.null_value),
                 ),
                 style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.testTag("ResultWatchers")
             )
         }
+
+        // Section for the number of stargazers
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -392,9 +397,10 @@ fun LanguageAndStatisticsSection(
             Text(
                 text = String.format(
                     stringResource(R.string.star_summary),
-                    stargazersCount,
+                    stargazersCount ?: stringResource(R.string.null_value),
                 ),
                 style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.testTag("ResultStargazers")
             )
         }
     }

@@ -13,7 +13,7 @@ This app is an application to search GitHub repositories and view detailed infor
 - IDE：Android Studio Giraffe | 2022.3.1
 - Kotlin：1.8.10
 - Java：17
-- Gradle：8.1.2
+- Gradle：8.1.3
 - minSdk：24
 - targetSdk：34
 

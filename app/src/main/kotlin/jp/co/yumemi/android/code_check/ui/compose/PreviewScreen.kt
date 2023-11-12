@@ -1,4 +1,4 @@
-package jp.co.yumemi.android.code_check.ui.view
+package jp.co.yumemi.android.code_check.ui.compose
 
 import android.content.Intent
 import android.net.Uri
@@ -26,6 +26,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
@@ -48,7 +49,7 @@ fun PreviewScreen(
             modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
         ) {
             item {
-                ImageSection(avatarUrl = it.owner.avatarUrl)
+                ImageSection(owner = it.owner)
             }
             item {
                 InfoSection(repository = it)
@@ -60,16 +61,16 @@ fun PreviewScreen(
 /**
  * Composable that displays the image of the repository owner's avatar.
  *
- * @param avatarUrl The URL of the repository owner's avatar.
+ * @param owner The owner of the repository. If null, a placeholder image is displayed.
  */
 @Composable
 fun ImageSection(
-    avatarUrl: String,
+    owner: Owner?,
 ) {
     val painter = rememberAsyncImagePainter(model = R.drawable.baseline_broken_image_24)
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(avatarUrl)
+            .data(owner?.avatarUrl)
             .crossfade(true)
             .build(),
         placeholder = painter,
@@ -92,34 +93,34 @@ fun ImageSection(
 fun InfoSection(
     repository: RepositoryItem
 ) {
-    RepositoryTitleName(repository.name)
+    RepositoryTitleNameSection(repository.name)
     Column(
         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.dp_20))
     ) {
-        OwnerLogin(repository.owner.login)
+        OwnerLoginSection(repository.owner)
     }
     Column(
         modifier = Modifier.padding(dimensionResource(id = R.dimen.dp_20))
     ) {
         DataField(
             title = stringResource(R.string.written_language),
-            value = repository.language
+            value = repository.language,
         )
         DataField(
             title = stringResource(R.string.stars_count),
-            value = repository.stargazersCount.toString()
+            value = repository.stargazersCount.toString(),
         )
         DataField(
             title = stringResource(R.string.watchers_count),
-            value = repository.watchersCount.toString()
+            value = repository.watchersCount.toString(),
         )
         DataField(
             title = stringResource(R.string.forks_count),
-            value = repository.forksCount.toString()
+            value = repository.forksCount.toString(),
         )
         DataField(
             title = stringResource(R.string.open_issues_count),
-            value = repository.openIssuesCount.toString()
+            value = repository.openIssuesCount.toString(),
         )
     }
     Column(
@@ -132,24 +133,27 @@ fun InfoSection(
 /**
  * Composable that displays the name of the repository.
  *
- * @param name The name of the repository.
+ * @param name The name of the repository. If null, nothing is displayed.
  */
 @Composable
-fun RepositoryTitleName(name: String) {
-    Text(
-        text = name,
-        style = MaterialTheme.typography.bodyLarge,
-        fontWeight = FontWeight.Bold
-    )
+fun RepositoryTitleNameSection(name: String?) {
+    name?.let {
+        Text(
+            text = name,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("PreviewRepositoryTitle")
+        )
+    }
 }
 
 /**
- * Composable that displays the owner's login information.
+ * Composable that displays the login name of the repository owner.
  *
- * @param owner The owner's login name.
+ * @param owner The owner of the repository. If null, a default null value is displayed.
  */
 @Composable
-fun OwnerLogin(owner: String) {
+fun OwnerLoginSection(owner: Owner?) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -159,66 +163,70 @@ fun OwnerLogin(owner: String) {
             color = MaterialTheme.colorScheme.outline
         )
         Text(
-            text = owner,
+            text = owner?.login ?: stringResource(R.string.null_value),
             style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.testTag("PreviewOwnerName")
         )
     }
 }
 
 /**
- * Composable that displays data fields.
+ * Composable that displays a field of data.
  *
  * @param title The title of the data field.
- * @param value The value of the data field.
+ * @param value The value to display. If null, a default null value is displayed.
  */
 @Composable
 fun DataField(
     title: String,
-    value: String?
+    value: String?,
 ) {
-    value?.let {
-        Column {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.outline
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Divider(
-                thickness = dimensionResource(id = R.dimen.dp_1),
-                modifier = Modifier.padding(
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.outline
+        )
+        Text(
+            text = value ?: stringResource(R.string.null_value),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.testTag("PreviewDataField")
+        )
+        Divider(
+            thickness = dimensionResource(id = R.dimen.dp_1),
+            modifier = Modifier
+                .padding(
                     top = dimensionResource(id = R.dimen.dp_8),
                     bottom = dimensionResource(id = R.dimen.dp_8)
                 )
-            )
-        }
+
+        )
     }
 }
 
 /**
  * Composable that displays a button to navigate to Github repository.
  *
- * @param url The URL of Github repository to navigate to.
+ * @param url The URL of Github repository to navigate to. If null, the button is not displayed.
  */
 @Composable
-fun GoToUrlSection(url: String) {
-    val context = LocalContext.current
-    Button(
-        onClick = {
-            val urlIntent = Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(url)
+fun GoToUrlSection(url: String?) {
+    url?.let {
+        val context = LocalContext.current
+        Button(
+            onClick = {
+                val urlIntent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(url)
+                )
+                context.startActivity(urlIntent)
+            },
+            modifier = Modifier.testTag("GoToRepoButton")
+        ) {
+            Text(
+                text = stringResource(id = R.string.go_to_repository),
             )
-            context.startActivity(urlIntent)
-        },
-        modifier = Modifier.testTag("GoToRepoButton")
-    ) {
-        Text(
-            text = stringResource(id = R.string.go_to_repository),
-        )
+        }
     }
 }
