@@ -6,9 +6,9 @@ This app is an application to search GitHub repositories and view detailed infor
 
 ## アプリ仕様
 
-<img src="docs/EN.mp4" width="320">
+<img src="docs/EN.gif" width="320">
 
-<img src="docs/JP.mp4" width="320">
+<img src="docs/JP.gif" width="320">
 
 ### 環境
 
