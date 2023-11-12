@@ -22,23 +22,21 @@ data class GitHubResponse(
 @Parcelize
 data class RepositoryItem(
 
-    val id: String,
-
-    @SerializedName("forks_count") val forksCount: Long,
+    @SerializedName("forks_count") val forksCount: Long?,
 
     val language: String?,
 
-    @SerializedName("name") val name: String,
+    val name: String?,
 
-    @SerializedName("open_issues_count") val openIssuesCount: Long,
+    @SerializedName("open_issues_count") val openIssuesCount: Long?,
 
-    val owner: Owner,
+    val owner: Owner?,
 
-    @SerializedName("stargazers_count") val stargazersCount: Long,
+    @SerializedName("stargazers_count") val stargazersCount: Long?,
 
-    @SerializedName("watchers_count") val watchersCount: Long,
+    @SerializedName("watchers_count") val watchersCount: Long?,
 
-    @SerializedName("html_url") val htmlUrl: String
+    @SerializedName("html_url") val htmlUrl: String?
 
 ) : Parcelable
 
@@ -49,8 +47,8 @@ data class RepositoryItem(
 @Parcelize
 data class Owner(
 
-    @SerializedName("login") val login: String,
+    @SerializedName("login") val login: String?,
 
-    @SerializedName("avatar_url") val avatarUrl: String
+    @SerializedName("avatar_url") val avatarUrl: String?
 
 ) : Parcelable

@@ -3,7 +3,7 @@
     <string name="searchInputText_hint">Enter GitHub repository name</string>
     <string name="language_summary">" %s"</string>
     <string name="watchers_summary">" %s"</string>
-    <string name="star_summary">" %d"</string>
+    <string name="star_summary">" %s"</string>
     <string name="written_language">Written in</string>
     <string name="stars_count">Stars</string>
     <string name="watchers_count">Watchers</string>
@@ -13,6 +13,7 @@
     <string name="clear_icon_description">Tap to clear entered keyword</string>
     <string name="image_description">Github Repository owner\'s avatar</string>
     <string name="by">"by "</string>
+    <string name="null_value">"-"</string>
     <string name="retry">Retry</string>
     <string name="no_result">No Results</string>
     <string name="oh_no">Oh no!</string>

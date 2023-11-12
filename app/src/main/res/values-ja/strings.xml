@@ -4,7 +4,7 @@
     <string name="searchInputText_hint">GitHub のリポジトリを検索できるよー</string>
     <string name="language_summary">" %s"</string>
     <string name="watchers_summary">" %s"</string>
-    <string name="star_summary">" %d"</string>
+    <string name="star_summary">" %s"</string>
     <string name="written_language">言語</string>
     <string name="stars_count">スター数</string>
     <string name="watchers_count">ウォッチャー数</string>
@@ -14,6 +14,7 @@
     <string name="clear_icon_description">入力されたキーワードを消去するにはタップ</string>
     <string name="image_description">GitHub リポジトリ所有者のアバター</string>
     <string name="by">"オーナー "</string>
+    <string name="null_value">"-"</string>
     <string name="retry">再試行</string>
     <string name="no_result">結果がありません</string>
     <string name="oh_no">あらまあ！</string>
