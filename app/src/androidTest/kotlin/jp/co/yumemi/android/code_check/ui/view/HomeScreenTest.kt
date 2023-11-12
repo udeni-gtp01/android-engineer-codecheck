@@ -119,6 +119,7 @@ class HomeScreenTest {
         val clearButton = composeTestRule.onNodeWithTag("ClearButton")
 
         searchField.performTextInput(searchKeyword)
+
         // Check if ClearButton is displayed
         clearButton.assertIsDisplayed()
 

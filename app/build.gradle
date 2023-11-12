@@ -41,47 +41,86 @@ android {
 }
 
 dependencies {
-    def composeBom = platform('androidx.compose:compose-bom:2023.10.01')
+    // Versions
+    def coreKtxVersion = '1.12.0'
+    def lifecycleVersion = '2.6.2'
+    def coroutineVersion = '1.7.3'
+    def coilVersion = '2.5.0'
+    def activityComposeVersion = '1.8.0'
+    def navigationComposeVersion = '2.7.5'
+    def material3Version = '1.1.2'
+    def hiltVersion = '1.1.0'
+    def gsonVersion = '2.10.1'
+    def retrofitVersion = '2.9.0'
+    def daggerVersion = '2.48.1'
+    def junitVersion = '4.13.2'
+    def junitExtVersion = '1.1.5'
+    def mockitoVersion = '5.7.0'
+    def archCoreVersion = '2.2.0'
+    def espressoVersion = '3.5.1'
+    def composeVersion = '2023.10.01'
+
+    // Core
+    implementation "androidx.core:core-ktx:$coreKtxVersion"
+
+    // Lifecycle
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutineVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:$coilVersion"
+
+    // Compose
+    def composeBom = platform("androidx.compose:compose-bom:$composeVersion")
     implementation(composeBom)
-    implementation 'androidx.core:core-ktx:1.12.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
-    implementation 'io.coil-kt:coil-compose:2.5.0'
-    implementation 'androidx.activity:activity-compose:1.8.0'
-    implementation 'androidx.compose.runtime:runtime'
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.foundation:foundation'
-    implementation 'androidx.compose.foundation:foundation-layout'
-    implementation 'androidx.compose.material3:material3:1.1.2'
-    implementation 'androidx.compose.material3:material3-window-size-class:1.1.2'
-    implementation 'androidx.compose.runtime:runtime-livedata'
-    implementation 'androidx.compose.ui:ui-tooling'
-    implementation 'androidx.navigation:navigation-compose:2.7.5'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.1.0'
-    implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.google.dagger:hilt-android:2.48.1'
-    ksp 'com.google.dagger:hilt-android-compiler:2.48.1'
+    implementation "androidx.activity:activity-compose:$activityComposeVersion"
+    implementation "androidx.compose.runtime:runtime"
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.ui:ui-tooling"
+    implementation "androidx.compose.foundation:foundation"
+    implementation "androidx.compose.foundation:foundation-layout"
+    implementation "androidx.compose.material3:material3:$material3Version"
+    implementation "androidx.compose.material3:material3-window-size-class:$material3Version"
+    implementation "androidx.compose.runtime:runtime-livedata"
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3'
-    testImplementation 'org.mockito:mockito-core:5.7.0'
-    testImplementation 'androidx.arch.core:core-testing:2.2.0'
+    // Navigation
+    implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
+    implementation "androidx.hilt:hilt-navigation-compose:$hiltVersion"
 
+    // JSON
+    implementation "com.google.code.gson:gson:$gsonVersion"
+
+    // Dagger hilt
+    implementation "com.google.dagger:hilt-android:$daggerVersion"
+    ksp "com.google.dagger:hilt-android-compiler:$daggerVersion"
+
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+
+    // Testing
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutineVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+
+    // Android testing
     androidTestImplementation(composeBom)
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.arch.core:core-testing:2.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.5.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
-    androidTestImplementation 'androidx.compose.ui:ui-test'
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
-    androidTestImplementation 'org.mockito:mockito-android:5.7.0'
+    androidTestImplementation "androidx.test.ext:junit:$junitExtVersion"
+    androidTestImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    androidTestImplementation "androidx.compose.ui:ui-test"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
 
+    // Debug
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 }
