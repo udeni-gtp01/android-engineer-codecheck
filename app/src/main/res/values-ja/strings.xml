@@ -17,7 +17,7 @@
     <string name="null_value">"-"</string>
     <string name="retry">再試行</string>
     <string name="no_result">結果がありません</string>
-    <string name="oh_no">あらまあ！</string>
+    <string name="oh_no">エラー</string>
     <string name="no_internet">インターネット接続が見つかりませんでした。接続を確認するか、もう一度やり直してください。</string>
     <string name="invalid_request">エラーが発生しました。入力したリポジトリ名を確認するか、もう一度やり直してください。</string>
     <string name="loading">読み込み中</string>
