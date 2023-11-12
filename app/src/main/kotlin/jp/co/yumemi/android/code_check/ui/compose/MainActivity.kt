@@ -1,7 +1,7 @@
 /*
  * Copyright © 2021 YUMEMI Inc. All rights reserved.
  */
-package jp.co.yumemi.android.code_check.ui.view
+package jp.co.yumemi.android.code_check.ui.compose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

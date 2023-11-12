@@ -7,8 +7,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import jp.co.yumemi.android.code_check.ui.view.HomeScreen
-import jp.co.yumemi.android.code_check.ui.view.PreviewScreen
+import jp.co.yumemi.android.code_check.ui.compose.HomeScreen
+import jp.co.yumemi.android.code_check.ui.compose.PreviewScreen
 import jp.co.yumemi.android.code_check.view_model.GithubRepoViewModel
 
 /**

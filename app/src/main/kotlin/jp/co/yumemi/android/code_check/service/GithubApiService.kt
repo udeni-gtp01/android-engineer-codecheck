@@ -8,7 +8,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 
 /**
- * Service interface for the GitHub API.
+ * Service interface for communicating with the GitHub API.
  */
 interface GithubApiService {
 
