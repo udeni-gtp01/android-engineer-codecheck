@@ -8,6 +8,7 @@ import jp.co.yumemi.android.code_check.model.Owner
 import jp.co.yumemi.android.code_check.model.RepositoryItem
 import jp.co.yumemi.android.code_check.model.ServerResult
 import jp.co.yumemi.android.code_check.repository.GithubRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -26,6 +27,7 @@ class GithubRepoViewModelTest {
     @get:Rule
     val instantTaskExecutorRule: InstantTaskExecutorRule = InstantTaskExecutorRule()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
@@ -68,7 +70,6 @@ class GithubRepoViewModelTest {
     fun `provided valid keyword should update the repository list`() =
         runTest {// Uses Main’s scheduler
             val repository1 = RepositoryItem(
-                id = "1",
                 name = "result repo 1/repo 1",
                 forksCount = 10,
                 language = "",
@@ -76,18 +77,17 @@ class GithubRepoViewModelTest {
                 stargazersCount = 10,
                 watchersCount = 10,
                 openIssuesCount = 10,
-                htmlUrl = "htmlurl"
+                htmlUrl = "html url"
             )
             val repository2 = RepositoryItem(
-                id = "2",
                 name = "result repo 2/repo 2",
-                forksCount = 10,
+                forksCount = 20,
                 language = "",
                 owner = Owner(login = "name", avatarUrl = "url"),
-                stargazersCount = 10,
-                watchersCount = 10,
-                openIssuesCount = 10,
-                htmlUrl = "htmlurl"
+                stargazersCount = 20,
+                watchersCount = 20,
+                openIssuesCount = 20,
+                htmlUrl = "html url"
             )
             val repoListResult = listOf(repository1, repository2)
 
@@ -97,31 +97,36 @@ class GithubRepoViewModelTest {
             Mockito.`when`(githubRepository.searchRepositoryList(keyword))
                 .thenReturn(ServerResult.Success(GitHubResponse(repoListResult)))
 
-            viewModel.searchKeyword = keyword
+            viewModel.updateSearchKeyword(keyword = keyword)
             viewModel.searchRepositoryList()
             assertEquals(repoListResult, viewModel.getRepositoryList())
         }
 
     @Test
     fun `provided invalid keyword should empty the repository list`() = runTest {
-        val expectedRepoListResult = emptyList<List<RepositoryItem>>()
-        viewModel.searchKeyword = "    "
+        val expectedRepoListResult = emptyList<RepositoryItem>()
+        viewModel.updateSearchKeyword(keyword = "    ")
         viewModel.searchRepositoryList()
         assertEquals(expectedRepoListResult, viewModel.getRepositoryList())
     }
 
     @Test
     fun `provided empty keyword should empty the repository list`() = runTest {
-        val expectedRepoListResult = emptyList<List<RepositoryItem>>()
-        viewModel.searchKeyword = ""
+        val expectedRepoListResult = emptyList<RepositoryItem>()
+        viewModel.updateSearchKeyword(keyword = "")
         viewModel.searchRepositoryList()
         assertEquals(expectedRepoListResult, viewModel.getRepositoryList())
     }
 
     @Test
-    fun `test setRepository`() {
+    fun `test clearSearchKeyword should clear the keyword`() = runTest {
+        viewModel.clearSearchKeyword()
+        assertTrue(viewModel.searchKeyword.isEmpty())
+    }
+
+    @Test
+    fun `test setRepository should update the repository list`() {
         val repositoryItem = RepositoryItem(
-            id = "1",
             name = "result repo 1/repo 1",
             forksCount = 10,
             language = "language",
@@ -129,7 +134,7 @@ class GithubRepoViewModelTest {
             stargazersCount = 10,
             watchersCount = 10,
             openIssuesCount = 10,
-            htmlUrl = "htmlurl"
+            htmlUrl = "html url"
         )
         viewModel.setRepository(repositoryItem)
         assertEquals(repositoryItem, viewModel.repositoryItem.value)
