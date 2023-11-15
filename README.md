@@ -6,7 +6,9 @@ This app is an application to search GitHub repositories and view detailed infor
 
 ## アプリ仕様
 
-<img src="https://github.com/udeni-gtp01/android-engineer-codecheck/assets/115888754/ddb5ed32-f953-4986-b7f2-171da394cd3a" width="320">
+<img src="docs/EN.gif" width="320">
+
+<img src="docs/JP.gif" width="320">
 
 ### 環境
 
