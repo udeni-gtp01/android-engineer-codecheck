@@ -1,19 +1,19 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
     id 'kotlin-parcelize'
-    id 'androidx.navigation.safeargs.kotlin'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
     namespace 'jp.co.yumemi.android.code_check'
-    compileSdk 31
+    compileSdk 34
 
     defaultConfig {
         applicationId "jp.co.yumemi.android.codecheck"
         minSdk 23
-        targetSdk 31
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -27,38 +27,93 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_19
+        targetCompatibility JavaVersion.VERSION_19
     }
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '19'
     }
     buildFeatures {
-        viewBinding true
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = '1.5.12'
     }
 }
 
 dependencies {
+    // Versions
+    def coreKtxVersion = '1.13.0'
+    def lifecycleVersion = '2.7.0'
+    def gsonVersion = '2.10.1'
+    def retrofitVersion = '2.11.0'
+    def daggerVersion = '2.51.1'
+    def coroutinesVersion = '1.8.0'
+    def composeVersion = '2024.04.01'
+    def navigationComposeVersion = '2.7.7'
+    def hiltVersion = '1.2.0'
+    def coilVersion = '2.6.0'
+    def junitVersion = '4.13.2'
+    def junitExtVersion = '1.1.5'
+    def mockitoVersion = '5.11.0'
+    def archCoreVersion = '2.2.0'
 
-    implementation 'androidx.core:core-ktx:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    // Core
+    implementation "androidx.core:core-ktx:$coreKtxVersion"
 
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    // Lifecycle
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
 
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    // JSON
+    implementation "com.google.code.gson:gson:$gsonVersion"
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
-    implementation 'io.ktor:ktor-client-android:1.6.4'
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
 
-    implementation 'io.coil-kt:coil:1.3.2'
+    // Dagger hilt
+    implementation "com.google.dagger:hilt-android:$daggerVersion"
+    ksp "com.google.dagger:hilt-android-compiler:$daggerVersion"
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    // Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
+
+    // Compose
+    implementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    implementation "androidx.activity:activity-compose"
+    implementation "androidx.compose.runtime:runtime"
+    implementation "androidx.compose.ui:ui"
+    implementation "androidx.compose.ui:ui-tooling"
+    implementation "androidx.compose.foundation:foundation"
+    implementation "androidx.compose.foundation:foundation-layout"
+    implementation "androidx.compose.material3:material3"
+    implementation "androidx.compose.material3:material3-window-size-class"
+    implementation "androidx.compose.runtime:runtime-livedata"
+
+    // Navigation
+    implementation "androidx.navigation:navigation-compose:$navigationComposeVersion"
+    implementation "androidx.hilt:hilt-navigation-compose:$hiltVersion"
+
+    // Coil
+    implementation "io.coil-kt:coil-compose:$coilVersion"
+
+    // Testing
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+
+    // Android testing
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation "androidx.compose.ui:ui-test"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4"
+    androidTestImplementation "androidx.test.ext:junit:$junitExtVersion"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
+    androidTestImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+
+    // Debug
+    debugImplementation "androidx.compose.ui:ui-test-manifest"
 }
