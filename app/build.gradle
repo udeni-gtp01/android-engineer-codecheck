@@ -16,6 +16,7 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -42,6 +43,7 @@ dependencies {
     def coreKtxVersion = '1.13.0'
     def lifecycleVersion = '2.7.0'
     def gsonVersion = '2.10.1'
+    def retrofitVersion = '2.11.0'
 
     // Core
     implementation "androidx.core:core-ktx:$coreKtxVersion"
@@ -54,6 +56,10 @@ dependencies {
     // JSON
     implementation "com.google.code.gson:gson:$gsonVersion"
 
+    // Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
