@@ -1,5 +1,26 @@
 <resources>
     <string name="app_name">Android Engineer CodeCheck</string>
-    <string name="searchInputText_hint">GitHub のリポジトリを検索できるよー</string>
-    <string name="written_language">Written in %s</string>
+    <string name="searchInputText_hint">Enter GitHub repository name</string>
+    <string name="language_summary">" %s"</string>
+    <string name="watchers_summary">" %s"</string>
+    <string name="star_summary">" %s"</string>
+    <string name="written_language">Written in</string>
+    <string name="stars_count">Stars</string>
+    <string name="watchers_count">Watchers</string>
+    <string name="forks_count">Forks</string>
+    <string name="open_issues_count">Open issues</string>
+    <string name="search_icon_description">Tap to search by entered keyword</string>
+    <string name="clear_icon_description">Tap to clear entered keyword</string>
+    <string name="image_description">Github Repository owner\'s avatar</string>
+    <string name="by">"by "</string>
+    <string name="null_value">"-"</string>
+    <string name="retry">Retry</string>
+    <string name="no_result">No Results</string>
+    <string name="oh_no">Oh no!</string>
+    <string name="no_internet">No Internet found. Check your connection or try again.
+    </string>
+    <string name="invalid_request">Error occurred. Check entered repository name or try again.
+    </string>
+    <string name="loading">Loading</string>
+    <string name="go_to_repository">Go to Repository</string>
 </resources>

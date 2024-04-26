@@ -42,6 +42,7 @@ class GitHubApiRepositoryImpl @Inject constructor(private val gitHubApiService: 
     override suspend fun searchGitHubRepositories(inputText: String): Flow<GitHubResponse<GitHubRepositoryList>> {
         return withContext(Dispatchers.IO) {
             return@withContext flow {
+                emit(GitHubResponse.Loading) // Indicate loading state
                 try {
                     val response = gitHubApiService.searchRepositories(inputText)
                     if (response.isSuccessful) {
