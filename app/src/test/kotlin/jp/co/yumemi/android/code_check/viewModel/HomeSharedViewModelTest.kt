@@ -27,7 +27,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
-class GithubRepoViewModelTest {
+class HomeSharedViewModelTest {
     //ensure that LiveData updates happen on the same thread in JUnit tests
     @get:Rule
     val instantTaskExecutorRule: InstantTaskExecutorRule = InstantTaskExecutorRule()
