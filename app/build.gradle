@@ -53,6 +53,10 @@ dependencies {
     def navigationComposeVersion = '2.7.7'
     def hiltVersion = '1.2.0'
     def coilVersion = '2.6.0'
+    def junitVersion = '4.13.2'
+    def junitExtVersion = '1.1.5'
+    def mockitoVersion = '5.11.0'
+    def archCoreVersion = '2.2.0'
 
     // Core
     implementation "androidx.core:core-ktx:$coreKtxVersion"
@@ -95,7 +99,21 @@ dependencies {
     // Coil
     implementation "io.coil-kt:coil-compose:$coilVersion"
 
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    // Testing
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+
+    // Android testing
+    androidTestImplementation(platform("androidx.compose:compose-bom:$composeVersion"))
+    androidTestImplementation "androidx.compose.ui:ui-test"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4"
+    androidTestImplementation "androidx.test.ext:junit:$junitExtVersion"
+    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
+    androidTestImplementation "androidx.arch.core:core-testing:$archCoreVersion"
+
+    // Debug
+    debugImplementation "androidx.compose.ui:ui-test-manifest"
 }
