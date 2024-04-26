@@ -5,6 +5,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.co.yumemi.android.code_check.constant.Constant.BASE_URL
+import jp.co.yumemi.android.code_check.repository.GitHubApiRepository
+import jp.co.yumemi.android.code_check.repository.GitHubApiRepositoryImpl
 import jp.co.yumemi.android.code_check.service.GitHubApiService
 import okhttp3.OkHttpClient
 import retrofit2.Converter
@@ -82,8 +84,7 @@ object NetworkModule {
 
     /**
      * Provides a singleton instance of the GitHubApiService interface.
-     *
-     * This interface defines methods for interacting with the GitHub API endpoints. Retrofit uses reflection to create an implementation
+     * which defines methods for interacting with the GitHub API endpoints. Retrofit uses reflection to create an implementation
      * of this interface based on the provided Retrofit instance and the annotations on the interface methods.
      *
      * @param retrofit The Retrofit instance configured for interacting with the GitHub API.
@@ -93,5 +94,21 @@ object NetworkModule {
     @Provides
     fun provideGithubApiService(retrofit: Retrofit): GitHubApiService {
         return retrofit.create(GitHubApiService::class.java)
+    }
+
+    /**
+     * Provides a singleton instance of the GitHubApiRepository interface
+     * which defines methods for interacting with the GitHub API related to repositories.
+     *
+     * This method injects the required `GitHubApiService` dependency and returns an instance of the
+     * `GitHubApiRepositoryImpl` class which implements the `GitHubApiRepository` interface.
+     *
+     * @param gitHubApiService The injected instance of the GitHubApiService interface.
+     * @return A singleton instance of the GitHubApiRepository interface.
+     */
+    @Singleton
+    @Provides
+    fun provideGitHubApiRepository(gitHubApiService: GitHubApiService): GitHubApiRepository {
+        return GitHubApiRepositoryImpl(gitHubApiService)
     }
 }

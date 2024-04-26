@@ -24,5 +24,5 @@ object Constant {
      * Setting this header ensures the API returns data in JSON format, which is
      * typically easier to parse within the application.
      */
-    const val HEADER_1 = "Accept: application/vnd.github.v3+json"
+    const val HEADER_TYPE = "application/vnd.github.v3+json"
 }
