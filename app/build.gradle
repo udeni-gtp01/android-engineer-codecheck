@@ -57,6 +57,7 @@ dependencies {
     def junitExtVersion = '1.1.5'
     def mockitoVersion = '5.11.0'
     def archCoreVersion = '2.2.0'
+    def roomVersion = "2.6.1"
 
     // Core
     implementation "androidx.core:core-ktx:$coreKtxVersion"
@@ -98,6 +99,11 @@ dependencies {
 
     // Coil
     implementation "io.coil-kt:coil-compose:$coilVersion"
+
+    // Room database
+    implementation "androidx.room:room-runtime:$roomVersion"
+    ksp "androidx.room:room-compiler:$roomVersion"
+    implementation("androidx.room:room-ktx:$roomVersion")
 
     // Testing
     testImplementation "junit:junit:$junitVersion"

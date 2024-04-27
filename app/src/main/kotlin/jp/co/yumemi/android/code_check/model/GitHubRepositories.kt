@@ -33,6 +33,7 @@ data class GitHubRepositoryList(
  */
 @Parcelize
 data class GitHubRepository(
+    val id: Long,
     @SerializedName("forks_count") val forksCount: Long?,
     val language: String?,
     val name: String?,
