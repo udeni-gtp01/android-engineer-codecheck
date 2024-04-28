@@ -25,4 +25,5 @@ object Constant {
      * typically easier to parse within the application.
      */
     const val HEADER_TYPE = "application/vnd.github.v3+json"
+    const val ROOM_GITHUB_REPO_TABLE_NAME = "github_repo_table"
 }

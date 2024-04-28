@@ -4,11 +4,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import jp.co.yumemi.android.code_check.constant.Constant.BASE_URL
+import jp.co.yumemi.android.code_check.constant.ApiEndpoint
+import jp.co.yumemi.android.code_check.constant.ApiEndpoint.BASE_URL
 import jp.co.yumemi.android.code_check.repository.GitHubApiRepository
 import jp.co.yumemi.android.code_check.repository.GitHubApiRepositoryImpl
 import jp.co.yumemi.android.code_check.service.GitHubApiService
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -110,5 +114,22 @@ object NetworkModule {
     @Provides
     fun provideGitHubApiRepository(gitHubApiService: GitHubApiService): GitHubApiRepository {
         return GitHubApiRepositoryImpl(gitHubApiService)
+    }
+}
+
+class NetworkInterceptor : Interceptor {
+    /**
+     * Intercepts the network request, modifies headers, and proceeds with the request.
+     *
+     * @param chain The OkHttp Interceptor Chain for handling the request.
+     * @return The response received after processing the modified request.
+     */
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest: Request = chain.request()
+
+        val modifiedRequest = originalRequest.newBuilder()
+            .header("Accept", ApiEndpoint.HEADER_TYPE)
+            .build()
+        return chain.proceed(modifiedRequest)
     }
 }
