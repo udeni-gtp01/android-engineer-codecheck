@@ -3,10 +3,12 @@ package jp.co.yumemi.android.code_check.repository
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Singleton
 
 /**
  * This interface defines methods for interacting with the GitHub API related to repositories.
  */
+@Singleton
 interface GitHubApiRepository {
     /**
      * This suspend function searches for GitHub repositories based on the provided input text.

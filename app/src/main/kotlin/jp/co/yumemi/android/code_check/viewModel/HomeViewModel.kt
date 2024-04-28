@@ -13,21 +13,26 @@ import jp.co.yumemi.android.code_check.constant.ApiResponseCode.EXCEPTION
 import jp.co.yumemi.android.code_check.model.GitHubRepository
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import jp.co.yumemi.android.code_check.model.GitHubResponse
+import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
 import jp.co.yumemi.android.code_check.repository.GitHubApiRepository
+import jp.co.yumemi.android.code_check.repository.LocalGitHubDatabaseRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * ViewModel class for the Home screen shared among Composable functions of HomeScreen and PreviewScreen.
+ * ViewModel class for the Home screen shared among Composable functions of HomeScreen and GitHubRepositoryInfoScreen.
  * Handles interactions between UI and data related to GitHub repositories.
  *
  * @param gitHubApiRepository The repository for interacting with the GitHub API.
  */
 @HiltViewModel
-class HomeSharedViewModel @Inject constructor(
-    private val gitHubApiRepository: GitHubApiRepository
+class HomeViewModel @Inject constructor(
+    private val gitHubApiRepository: GitHubApiRepository,
+    private val localGitHubDatabaseRepository: LocalGitHubDatabaseRepository
 ) : ViewModel() {
     // Logging tag for this class
     private val TAG = this.javaClass.simpleName
@@ -37,12 +42,13 @@ class HomeSharedViewModel @Inject constructor(
     private val _gitHubApiResult = MutableLiveData<GitHubResponse<GitHubRepositoryList>>()
     val gitHubApiResult: LiveData<GitHubResponse<GitHubRepositoryList>> = _gitHubApiResult
 
+    private val _isSavedSelectedGitHubRepositoryState =
+        MutableStateFlow<GitHubResponse<Boolean>>(GitHubResponse.Success(true))
+    val isSavedSelectedGitHubRepositoryState: StateFlow<GitHubResponse<Boolean>> =
+        _isSavedSelectedGitHubRepositoryState
+
     // Internal list to store the fetched GitHub repository items.
     private var gitHubRepositoryList: List<GitHubRepository> = emptyList()
-
-    // LiveData to observe the currently selected GitHub repository item.
-    private val _gitHubRepository = MutableLiveData<GitHubRepository>(null)
-    val gitHubRepository: LiveData<GitHubRepository> = _gitHubRepository
 
     //  Two-way data binding property for the user's search keyword.
     var searchKeyword by mutableStateOf("")
@@ -68,7 +74,7 @@ class HomeSharedViewModel @Inject constructor(
                     Log.e(
                         TAG,
                         ex.message
-                            ?: "An error occurred while searching GitHub repositories for keyword $searchKeyword",
+                            ?: "An error occurred while searching GitHub repositories for keyword: $searchKeyword",
                         ex
                     )
                 }
@@ -107,9 +113,6 @@ class HomeSharedViewModel @Inject constructor(
      *
      * @param selectedGitHubRepository The selected GitHub repository.
      */
-    fun setRepository(selectedGitHubRepository: GitHubRepository) {
-        _gitHubRepository.value = selectedGitHubRepository
-    }
 
     /**
      * Updates the [searchKeyword] property with the provided new value.
@@ -125,5 +128,37 @@ class HomeSharedViewModel @Inject constructor(
      */
     fun clearSearchKeyword() {
         searchKeyword = ""
+    }
+
+    fun saveSelectedGitHubRepositoryInDatabase(gitHubRepository: GitHubRepository) {
+        viewModelScope.launch {
+            try {
+                val localGitHubRepository = LocalGitHubRepository(
+                    id = gitHubRepository.id,
+                    forksCount = gitHubRepository.forksCount,
+                    language = gitHubRepository.language,
+                    name = gitHubRepository.name,
+                    openIssuesCount = gitHubRepository.openIssuesCount,
+                    stargazersCount = gitHubRepository.stargazersCount,
+                    watchersCount = gitHubRepository.watchersCount,
+                    htmlUrl = gitHubRepository.htmlUrl,
+                    ownerLogin = gitHubRepository.owner?.login,
+                    ownerAvatarUrl = gitHubRepository.owner?.avatarUrl
+                )
+                localGitHubDatabaseRepository.saveSelectedGitHubRepositoryInDatabase(
+                    localGitHubRepository
+                ).flowOn(Dispatchers.IO).collect {
+                    _isSavedSelectedGitHubRepositoryState.value = it
+                }
+            } catch (ex: Exception) {
+                _isSavedSelectedGitHubRepositoryState.value = GitHubResponse.Error(EXCEPTION)
+                Log.e(
+                    TAG,
+                    ex.message
+                        ?: "An error occurred while saving selected GitHub repository: ${gitHubRepository.id}",
+                    ex
+                )
+            }
+        }
     }
 }

@@ -26,10 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -39,27 +39,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.GitHubRepository
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryOwner
 import jp.co.yumemi.android.code_check.model.GitHubResponse
-import jp.co.yumemi.android.code_check.viewModel.HomeSharedViewModel
+import jp.co.yumemi.android.code_check.viewModel.HomeViewModel
 
 /**
  * Composable function representing the main screen of the app.
  *
  * @param onRepositoryItemClicked Callback function when a repository item is clicked.
- * @param githubRepoViewModel The ViewModel for managing data and interactions.
  * @param modifier Modifier for customizing the layout.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
-    onRepositoryItemClicked: () -> Unit,
-    homeSharedViewModel: HomeSharedViewModel,
+    onRepositoryItemClicked: (Long) -> Unit,
+    homeViewModel: HomeViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val gitHubApiResult by homeSharedViewModel.gitHubApiResult.observeAsState(initial = null)
+    val gitHubApiResult by homeViewModel.gitHubApiResult.observeAsState(initial = null)
+    val isSavedSelectedGitHubRepositoryState =
+        homeViewModel.isSavedSelectedGitHubRepositoryState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Column(
@@ -67,13 +68,13 @@ fun HomeScreen(
             .padding(dimensionResource(id = R.dimen.dp_10))
     ) {
         SearchSection(
-            searchKeyword = homeSharedViewModel.searchKeyword,
-            onSearchKeywordChange = { homeSharedViewModel.updateSearchKeyword(it) },
+            searchKeyword = homeViewModel.searchKeyword,
+            onSearchKeywordChange = { homeViewModel.updateSearchKeyword(it) },
             onSearchClicked = {
                 keyboardController?.hide()
-                homeSharedViewModel.searchGitHubRepositories()
+                homeViewModel.searchGitHubRepositories()
             },
-            onClearButtonClicked = { homeSharedViewModel.clearSearchKeyword() },
+            onClearButtonClicked = { homeViewModel.clearSearchKeyword() },
         )
 
         when (gitHubApiResult) {
@@ -85,22 +86,27 @@ fun HomeScreen(
                 ErrorScreen(
                     errorTitle = stringResource(id = R.string.oh_no),
                     errorMessage = stringResource(id = R.string.invalid_request),
-                    onRetryButtonClicked = { homeSharedViewModel.searchGitHubRepositories() })
+                    onRetryButtonClicked = { homeViewModel.searchGitHubRepositories() })
             }
 
             is GitHubResponse.Error -> {
                 ErrorScreen(
                     errorTitle = stringResource(id = R.string.oh_no),
                     errorMessage = stringResource(id = R.string.no_internet),
-                    onRetryButtonClicked = { homeSharedViewModel.searchGitHubRepositories() })
+                    onRetryButtonClicked = { homeViewModel.searchGitHubRepositories() })
             }
 
             else -> {
                 SearchResultSection(
-                    repositoryList = homeSharedViewModel.getRepositoryList(),
-                    onRepositoryItemClicked = { selectedRepository ->
-                        homeSharedViewModel.setRepository(selectedRepository)
-                        onRepositoryItemClicked()
+                    repositoryList = homeViewModel.getRepositoryList(),
+                    onRepositoryItemClicked = { selectedGitHubRepository ->
+
+                        homeViewModel.saveSelectedGitHubRepositoryInDatabase(
+                            selectedGitHubRepository
+                        )
+                        if (isSavedSelectedGitHubRepositoryState.value is GitHubResponse.Success) {
+                            onRepositoryItemClicked(selectedGitHubRepository.id)
+                        }
                     },
                 )
             }

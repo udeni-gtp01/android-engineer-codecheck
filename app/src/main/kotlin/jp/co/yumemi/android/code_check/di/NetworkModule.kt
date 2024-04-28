@@ -6,6 +6,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import jp.co.yumemi.android.code_check.constant.ApiEndpoint
 import jp.co.yumemi.android.code_check.constant.ApiEndpoint.BASE_URL
+import jp.co.yumemi.android.code_check.logger.Logger
+import jp.co.yumemi.android.code_check.logger.LoggerImpl
 import jp.co.yumemi.android.code_check.repository.GitHubApiRepository
 import jp.co.yumemi.android.code_check.repository.GitHubApiRepositoryImpl
 import jp.co.yumemi.android.code_check.service.GitHubApiService
@@ -114,6 +116,19 @@ object NetworkModule {
     @Provides
     fun provideGitHubApiRepository(gitHubApiService: GitHubApiService): GitHubApiRepository {
         return GitHubApiRepositoryImpl(gitHubApiService)
+    }
+
+    /**
+     * Provides a singleton instance of the `Logger` interface. This function uses Dagger's
+     *
+     * The current implementation returns an instance of `LoggerImpl`.
+     *
+     * @return A singleton instance of the `Logger` interface.
+     */
+    @Singleton
+    @Provides
+    fun provideLogger(): Logger {
+        return LoggerImpl()
     }
 }
 

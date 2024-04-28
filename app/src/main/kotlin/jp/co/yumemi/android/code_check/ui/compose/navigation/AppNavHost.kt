@@ -2,14 +2,12 @@ package jp.co.yumemi.android.code_check.ui.compose.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import jp.co.yumemi.android.code_check.ui.compose.GitHubRepositoryInfoScreen
 import jp.co.yumemi.android.code_check.ui.compose.HomeScreen
-import jp.co.yumemi.android.code_check.ui.compose.PreviewScreen
-import jp.co.yumemi.android.code_check.viewModel.HomeSharedViewModel
 
 /**
  * Composable function responsible for hosting the navigation flow of the app.
@@ -19,23 +17,36 @@ import jp.co.yumemi.android.code_check.viewModel.HomeSharedViewModel
  */
 @Composable
 fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
-    // Create an instance of the ViewModel
-    val viewModel: HomeSharedViewModel = hiltViewModel()
-
     // Define the navigation flow using a NavHost
-    NavHost(navController = navController, startDestination = GithubRepositoryList.route) {
-        composable(route = GithubRepositoryList.route) {
+    NavHost(navController = navController, startDestination = HomeDestination.route) {
+        composable(route = HomeDestination.route) {
+            /**
+             * The Home screen composable. This screen displays a list of GitHub repositories
+             * and allows users to click on them to navigate to the github repository info screen.
+             *
+             * @param onRepositoryItemClicked A callback function invoked when a user clicks on a repository item.
+             *        This function receives the ID of the selected repository.
+             * @param modifier Additional modifier to be applied to the composable.
+             */
             HomeScreen(
-                homeSharedViewModel = viewModel,
-                onRepositoryItemClicked = {
-                    navController.navigateSingleTopTo(GithubRepositoryPreview.route)
+                onRepositoryItemClicked = { selectedGitHubRepositoryId ->
+                    navController.navigateToGithubRepositoryInfo(selectedGitHubRepositoryId)
                 },
                 modifier = modifier,
             )
         }
-        composable(route = GithubRepositoryPreview.route) {
-            PreviewScreen(
-                homeSharedViewModel = viewModel,
+        composable(
+            route = GitHubRepositoryInfoDestination.routeWithArgs,
+            arguments = GitHubRepositoryInfoDestination.arguments
+        ) {
+            /**
+             * The composable screen for displaying detailed information about a specific GitHub repository.
+             * This screen is accessible by navigating to the route `${GitHubRepositoryInfoDestination.route}/`
+             * followed by the repository ID as an argument.
+             *
+             * @param modifier Additional modifier to be applied to the composable.
+             */
+            GitHubRepositoryInfoScreen(
                 modifier = modifier
             )
         }
@@ -55,12 +66,22 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         popUpTo(
             this@navigateSingleTopTo.graph.findStartDestination().id
         ) {
-            saveState = true
+            saveState = false
         }
         // Avoid multiple copies of the same destination when
-        // re-selecting the same item
+        // reselecting the same item
         launchSingleTop = true
-        // Restore state when re-selecting a previously selected item
+        // Restore state when reselecting a previously selected item
         restoreState = true
     }
 
+/**
+ * Navigates to the GitHub repository info screen with a single top behavior.
+ * This function uses `navigateSingleTopTo` to avoid creating duplicate destinations
+ * on the back stack when the user repeatedly selects the same repository item.
+ *
+ * @param selectedGitHubRepositoryId The ID of the selected GitHub repository to be displayed.
+ */
+private fun NavHostController.navigateToGithubRepositoryInfo(selectedGitHubRepositoryId: Long) {
+    this.navigateSingleTopTo("${GitHubRepositoryInfoDestination.route}/$selectedGitHubRepositoryId")
+}

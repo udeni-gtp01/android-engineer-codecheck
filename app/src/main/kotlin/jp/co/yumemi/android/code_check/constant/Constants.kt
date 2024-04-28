@@ -2,10 +2,10 @@ package jp.co.yumemi.android.code_check.constant
 
 /**
  * This object provides constant values used throughout the application
- * for interacting with the GitHub API. These constants ensure consistency and
- * avoid typos when making API calls.
+ * for interacting with the GitHub API. Using constants ensures consistency, reduces the risk of typos,
+ * and improves code readability.
  */
-object Constant {
+object ApiEndpoint {
 
     /**
      * The base URL for the GitHub API. This URL is prepended to all API endpoints.
@@ -25,5 +25,37 @@ object Constant {
      * typically easier to parse within the application.
      */
     const val HEADER_TYPE = "application/vnd.github.v3+json"
+}
+
+/**
+ * This object holds constant values related to the database used by the application.
+ */
+object DatabaseConstant {
+    /**
+     * Constant string representing the name of the table in the database that stores information
+     * about selected GitHub repository to view info.
+     */
     const val ROOM_GITHUB_REPO_TABLE_NAME = "github_repo_table"
+}
+
+/**
+ * This object provides constant values used for arguments passed between navigation events.
+ * Using constants for argument names improves code readability, reduces typos, and ensures
+ * consistency across the application.
+ */
+object NavigationArgument {
+    /**
+     * The key used to access the GitHub repository ID argument passed during navigation.
+     */
+    const val ARGUMENT_GITHUB_REPO_ID = "gitHubRepoId"
+
+    /**
+     * The constant representing app home destination.
+     */
+    const val DESTINATION_HOME = "home"
+
+    /**
+     * The constant representing github repository info destination.
+     */
+    const val DESTINATION_GITHUB_REPO_INFO = "repo_info"
 }

@@ -12,8 +12,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -22,37 +21,56 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.model.GitHubRepository
-import jp.co.yumemi.android.code_check.model.GitHubRepositoryOwner
-import jp.co.yumemi.android.code_check.viewModel.HomeSharedViewModel
+import jp.co.yumemi.android.code_check.model.GitHubResponse
+import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
+import jp.co.yumemi.android.code_check.viewModel.GitHubRepositoryInfoViewModel
 
 /**
  * Composable that displays a preview of a repository.
  *
- * @param githubRepoViewModel The ViewModel providing repository information.
  * @param modifier Modifier for customizing the layout.
  */
 @Composable
-fun PreviewScreen(
-    homeSharedViewModel: HomeSharedViewModel,
-    modifier: Modifier = Modifier
+fun GitHubRepositoryInfoScreen(
+    modifier: Modifier = Modifier,
+    gitHubRepositoryInfoViewModel: GitHubRepositoryInfoViewModel = hiltViewModel()
 ) {
-    val repository: GitHubRepository? by homeSharedViewModel.gitHubRepository.observeAsState(null)
+    val repositoryState =
+        gitHubRepositoryInfoViewModel.gitHubRepositoryInfo?.collectAsState(initial = null)
 
-    repository?.let {
-        LazyColumn(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
-        ) {
-            item {
-                ImageSection(owner = it.owner)
-            }
-            item {
-                InfoSection(repository = it)
+    repositoryState?.let {
+        it.value?.let { repositoryState ->
+            MainInfoSection(
+                repositoryState = repositoryState,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+fun MainInfoSection(
+    repositoryState: GitHubResponse<LocalGitHubRepository?>,
+    modifier: Modifier = Modifier,
+) {
+    if (repositoryState is GitHubResponse.Success) {
+        val repository = repositoryState
+        repository.data?.let {
+            LazyColumn(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
+            ) {
+                item {
+                    ImageSection(ownerAvatarUrl = repository.data.ownerAvatarUrl)
+                }
+                item {
+                    InfoSection(repository = it)
+                }
             }
         }
     }
@@ -65,12 +83,12 @@ fun PreviewScreen(
  */
 @Composable
 fun ImageSection(
-    owner: GitHubRepositoryOwner?,
+    ownerAvatarUrl: String?,
 ) {
     val painter = rememberAsyncImagePainter(model = R.drawable.baseline_broken_image_24)
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
-            .data(owner?.avatarUrl)
+            .data(ownerAvatarUrl)
             .crossfade(true)
             .build(),
         placeholder = painter,
@@ -91,13 +109,13 @@ fun ImageSection(
  */
 @Composable
 fun InfoSection(
-    repository: GitHubRepository
+    repository: LocalGitHubRepository
 ) {
     RepositoryTitleNameSection(repository.name)
     Column(
         modifier = Modifier.padding(top = dimensionResource(id = R.dimen.dp_20))
     ) {
-        OwnerLoginSection(repository.owner)
+        OwnerLoginSection(repository.ownerLogin)
     }
     Column(
         modifier = Modifier.padding(dimensionResource(id = R.dimen.dp_20))
@@ -153,7 +171,7 @@ fun RepositoryTitleNameSection(name: String?) {
  * @param owner The owner of the repository. If null, a default null value is displayed.
  */
 @Composable
-fun OwnerLoginSection(owner: GitHubRepositoryOwner?) {
+fun OwnerLoginSection(ownerLoginName: String?) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -163,7 +181,7 @@ fun OwnerLoginSection(owner: GitHubRepositoryOwner?) {
             color = MaterialTheme.colorScheme.outline
         )
         Text(
-            text = owner?.login ?: stringResource(R.string.null_value),
+            text = ownerLoginName ?: stringResource(R.string.null_value),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.testTag("PreviewOwnerName")
         )
