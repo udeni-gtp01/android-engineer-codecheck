@@ -1,9 +1,9 @@
 package jp.co.yumemi.android.code_check.repository
 
 import android.util.Log
-import jp.co.yumemi.android.code_check.constant.ApiResponseCode.EXCEPTION
-import jp.co.yumemi.android.code_check.constant.ApiResponseCode.IOEXCEPTION
-import jp.co.yumemi.android.code_check.constant.ApiResponseCode.TIMEOUT_EXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.IOEXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.TIMEOUT_EXCEPTION
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.service.GitHubApiService

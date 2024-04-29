@@ -27,8 +27,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -58,7 +56,7 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     modifier: Modifier = Modifier
 ) {
-    val gitHubApiResult by homeViewModel.gitHubApiResult.observeAsState(initial = null)
+    val gitHubSearchResultState = homeViewModel.gitHubSearchResultState.collectAsState()
     val isSavedSelectedGitHubRepositoryState =
         homeViewModel.isSavedSelectedGitHubRepositoryState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -77,28 +75,23 @@ fun HomeScreen(
             onClearButtonClicked = { homeViewModel.clearSearchKeyword() },
         )
 
-        when (gitHubApiResult) {
+        when (gitHubSearchResultState.value) {
             is GitHubResponse.Loading -> {
                 LoadingScreen()
             }
 
             is GitHubResponse.Error -> {
                 ErrorScreen(
-                    errorTitle = stringResource(id = R.string.oh_no),
-                    errorMessage = stringResource(id = R.string.invalid_request),
+                    errorTitle = R.string.oh_no,
+                    errorCode = (gitHubSearchResultState.value as GitHubResponse.Error).error,
                     onRetryButtonClicked = { homeViewModel.searchGitHubRepositories() })
             }
 
-            is GitHubResponse.Error -> {
-                ErrorScreen(
-                    errorTitle = stringResource(id = R.string.oh_no),
-                    errorMessage = stringResource(id = R.string.no_internet),
-                    onRetryButtonClicked = { homeViewModel.searchGitHubRepositories() })
-            }
-
-            else -> {
+            is GitHubResponse.Success -> {
+                val gitHubSearchResult =
+                    gitHubSearchResultState.value as GitHubResponse.Success
                 SearchResultSection(
-                    repositoryList = homeViewModel.getRepositoryList(),
+                    repositoryList = gitHubSearchResult.data.items,
                     onRepositoryItemClicked = { selectedGitHubRepository ->
 
                         homeViewModel.saveSelectedGitHubRepositoryInDatabase(

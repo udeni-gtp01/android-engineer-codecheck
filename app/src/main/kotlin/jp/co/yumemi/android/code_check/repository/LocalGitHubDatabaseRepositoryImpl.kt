@@ -1,7 +1,7 @@
 package jp.co.yumemi.android.code_check.repository
 
 import android.util.Log
-import jp.co.yumemi.android.code_check.constant.ApiResponseCode
+import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
 import jp.co.yumemi.android.code_check.database.GitHubRepositoryDao
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
@@ -43,7 +43,7 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                     gitHubRepositoryDao.insertGitHubRepository(localGitHubRepository)
                     emit(GitHubResponse.Success(true))
                 } catch (ex: Exception) {
-                    emit(GitHubResponse.Error(ApiResponseCode.EXCEPTION))
+                    emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage =
                         "An unexpected error occurred while saving selected github repository: ${ex.message}"
                     Log.e(TAG, errorMessage, ex)
@@ -68,7 +68,7 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                     gitHubRepositoryDao.getGitHubRepositoryById(selectedGitHubRepositoryId)
                 emit(GitHubResponse.Success(response))
             } catch (ex: Exception) {
-                emit(GitHubResponse.Error(ApiResponseCode.EXCEPTION))
+                emit(GitHubResponse.Error(EXCEPTION))
                 val errorMessage =
                     "An unexpected error occurred while retrieving selected github repository: ${ex.message}"
                 Log.e(TAG, errorMessage, ex)

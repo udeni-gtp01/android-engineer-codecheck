@@ -18,6 +18,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.constant.ResponseCode
+import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.IOEXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.TIMEOUT_EXCEPTION
 
 /**
  * Composable function for displaying an error screen with a title, error message, and retry button.
@@ -28,8 +32,8 @@ import jp.co.yumemi.android.code_check.R
  */
 @Composable
 fun ErrorScreen(
-    errorTitle: String,
-    errorMessage: String,
+    errorTitle: Int,
+    errorCode: String?,
     onRetryButtonClicked: () -> Any,
 ) {
     Column(
@@ -39,10 +43,27 @@ fun ErrorScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LoadErrorSection(
-            errorTitle = errorTitle,
-            errorMessage = errorMessage,
+            errorTitle = stringResource(id = errorTitle),
+            errorMessage = stringResource(id = decodeErrorMessage(errorCode)),
             onRetryButtonClicked = onRetryButtonClicked,
         )
+    }
+}
+
+/**
+ * Function to retrieve localized error message for the provided error code.
+ *
+ * @param errorCode The error code to determine the error message.
+ * @return The resource ID of the corresponding error message.
+ */
+@Composable
+fun decodeErrorMessage(errorCode: String? = EXCEPTION): Int {
+    return when (errorCode) {
+        ResponseCode.STATUS_CODE_422 -> R.string.invalid_request
+        ResponseCode.STATUS_CODE_503 -> R.string.service_unavailable
+        IOEXCEPTION -> R.string.no_internet
+        TIMEOUT_EXCEPTION -> R.string.timeout_error
+        else -> R.string.general_error
     }
 }
 
@@ -94,8 +115,8 @@ fun LoadErrorSection(
 @Composable
 fun PreviewErrorScreen() {
     ErrorScreen(
-        errorTitle = "Oh no!",
-        errorMessage = "error description",
+        errorTitle = R.string.oh_no,
+        errorCode = EXCEPTION,
         onRetryButtonClicked = {},
     )
 }

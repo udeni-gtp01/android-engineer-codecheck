@@ -59,3 +59,27 @@ object NavigationArgument {
      */
     const val DESTINATION_GITHUB_REPO_INFO = "repo_info"
 }
+
+/**
+ * This object provides HTTP response codes from GitHub REST API and exception messages
+ * to aid in error handling and interpretation of network responses.
+ */
+object ResponseCode {
+    /** HTTP response status codes for 'OK' success response */
+    const val STATUS_CODE_200 = "200"
+
+    /** HTTP response status codes for 'Validation failed, or the endpoint has been spammed' error response */
+    const val STATUS_CODE_422 = "422"
+
+    /** HTTP response status codes for 'Service unavailable' error response */
+    const val STATUS_CODE_503 = "503"
+
+    /** A string constant representing the exception message for IOException network errors. */
+    const val IOEXCEPTION = "IOException"
+
+    /** A string constant representing the generic exception message. */
+    const val EXCEPTION = "Exception"
+
+    /** A string constant representing the exception message for timeout exceptions. */
+    const val TIMEOUT_EXCEPTION = "Timeout"
+}

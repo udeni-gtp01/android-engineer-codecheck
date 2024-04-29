@@ -4,12 +4,10 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.co.yumemi.android.code_check.constant.ApiResponseCode.EXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
 import jp.co.yumemi.android.code_check.model.GitHubRepository
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import jp.co.yumemi.android.code_check.model.GitHubResponse
@@ -37,18 +35,22 @@ class HomeViewModel @Inject constructor(
     // Logging tag for this class
     private val TAG = this.javaClass.simpleName
 
-    // LiveData to observe the outcome of GitHub repository searches.
+    // StateFlow for holding the outcome of GitHub repository searches.
     // It emits [GitHubResponse] objects representing success, error, or loading state.
-    private val _gitHubApiResult = MutableLiveData<GitHubResponse<GitHubRepositoryList>>()
-    val gitHubApiResult: LiveData<GitHubResponse<GitHubRepositoryList>> = _gitHubApiResult
+    private val _gitHubSearchResultState = MutableStateFlow<GitHubResponse<GitHubRepositoryList>>(
+        GitHubResponse.Success(
+            GitHubRepositoryList(
+                emptyList()
+            )
+        )
+    )
+    val gitHubSearchResultState: StateFlow<GitHubResponse<GitHubRepositoryList>> =
+        _gitHubSearchResultState
 
     private val _isSavedSelectedGitHubRepositoryState =
         MutableStateFlow<GitHubResponse<Boolean>>(GitHubResponse.Success(true))
     val isSavedSelectedGitHubRepositoryState: StateFlow<GitHubResponse<Boolean>> =
         _isSavedSelectedGitHubRepositoryState
-
-    // Internal list to store the fetched GitHub repository items.
-    private var gitHubRepositoryList: List<GitHubRepository> = emptyList()
 
     //  Two-way data binding property for the user's search keyword.
     var searchKeyword by mutableStateOf("")
@@ -60,17 +62,18 @@ class HomeViewModel @Inject constructor(
      */
     fun searchGitHubRepositories() {
         if (searchKeyword.isBlank()) {
-            setServerResult(GitHubResponse.Success(GitHubRepositoryList(emptyList())))
+            _gitHubSearchResultState.value =
+                GitHubResponse.Success(GitHubRepositoryList(emptyList()))
         } else {
             viewModelScope.launch {
                 try {
                     gitHubApiRepository.searchGitHubRepositories(searchKeyword)
                         .flowOn(Dispatchers.IO)
                         .collect {
-                            setServerResult(it)
+                            _gitHubSearchResultState.value = it
                         }
                 } catch (ex: Exception) {
-                    setServerResult(GitHubResponse.Error(EXCEPTION))
+                    _gitHubSearchResultState.value = GitHubResponse.Error(EXCEPTION)
                     Log.e(
                         TAG,
                         ex.message
@@ -81,38 +84,6 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
-
-    /**
-     * Updates the [_gitHubApiResult] LiveData and the [gitHubRepositoryList] based on the provided [GitHubResponse].
-     * This function is responsible for handling different response types (Success, Error, etc.) and updating the UI.
-     *
-     * @param gitHubResponse The result of the GitHub repository search.
-     */
-    private fun setServerResult(gitHubResponse: GitHubResponse<GitHubRepositoryList>) {
-        _gitHubApiResult.value = gitHubResponse
-        gitHubRepositoryList = when (gitHubResponse) {
-            is GitHubResponse.Success -> {
-                gitHubResponse.data.items
-            }
-
-            else -> {
-                emptyList()
-            }
-        }
-    }
-
-    /**
-     * Returns the current list of fetched GitHub repository items.
-     */
-    fun getRepositoryList(): List<GitHubRepository> {
-        return gitHubRepositoryList
-    }
-
-    /**
-     * Sets the currently selected GitHub repository item in the [_gitHubRepository] LiveData.
-     *
-     * @param selectedGitHubRepository The selected GitHub repository.
-     */
 
     /**
      * Updates the [searchKeyword] property with the provided new value.
