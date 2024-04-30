@@ -1,6 +1,5 @@
 package jp.co.yumemi.android.code_check.viewModel
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
+import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.model.GitHubRepository
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import jp.co.yumemi.android.code_check.model.GitHubResponse
@@ -30,7 +30,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val gitHubApiRepository: GitHubApiRepository,
-    private val localGitHubDatabaseRepository: LocalGitHubDatabaseRepository
+    private val localGitHubDatabaseRepository: LocalGitHubDatabaseRepository,
+    private val logger: Logger
 ) : ViewModel() {
     // Logging tag for this class
     private val TAG = this.javaClass.simpleName
@@ -75,7 +76,8 @@ class HomeViewModel @Inject constructor(
                         }
                 } catch (ex: Exception) {
                     _gitHubSearchResultState.value = GitHubResponse.Error(EXCEPTION)
-                    Log.e(
+
+                    logger.error(
                         TAG,
                         ex.message
                             ?: "An error occurred while searching GitHub repositories for keyword: $searchKeyword",
@@ -124,7 +126,7 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (ex: Exception) {
                 _isSelectedGitHubRepositorySavedState.value = GitHubResponse.Error(EXCEPTION)
-                Log.e(
+                logger.error(
                     TAG,
                     ex.message
                         ?: "An error occurred while saving selected GitHub repository: ${gitHubRepository.id}",

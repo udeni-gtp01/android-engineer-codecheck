@@ -1,8 +1,5 @@
 package jp.co.yumemi.android.code_check.viewModel
 
-import androidx.lifecycle.SavedStateHandle
-import jp.co.yumemi.android.code_check.constant.NavigationArgument.ARGUMENT_GITHUB_REPO_ID
-import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
 import jp.co.yumemi.android.code_check.repository.LocalGitHubDatabaseRepository
@@ -14,10 +11,12 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
 import org.mockito.junit.MockitoJUnitRunner
 
 /**
@@ -30,20 +29,13 @@ class GitHubRepositoryInfoViewModelTest {
     private lateinit var viewModel: GitHubRepositoryInfoViewModel
 
     @Mock
-    private lateinit var savedStateHandle: SavedStateHandle
-
-    @Mock
     private lateinit var localGitHubDatabaseRepository: LocalGitHubDatabaseRepository
-
-    @Mock
-    private lateinit var logger: Logger
 
     /**
      * A mock instance of `LocalGitHubRepository` representing a test repository.
      * This object is used to provide expected data for the test cases.
      */
     private val testGitHubRepository = LocalGitHubRepository(
-        id = 12345,
         forksCount = 50,
         language = "Kotlin",
         name = "My Awesome Project",
@@ -56,38 +48,31 @@ class GitHubRepositoryInfoViewModelTest {
     )
 
     /**
-     * This test verifies that when a valid repository ID is provided as an argument,
-     * the ViewModel emits a success response containing the corresponding repository data
+     * The ViewModel emits a success response containing the corresponding repository data
      * retrieved from the `localGitHubDatabaseRepository`.
      */
     @Test
-    fun `valid github repository id argument should emit success response`() = runTest {
-        `when`(savedStateHandle.get<Long>(ARGUMENT_GITHUB_REPO_ID))
-            .thenReturn(testGitHubRepository.id)
+    fun `getSelectedGitHubRepositoryFromDatabase should emit success response if no error`() =
+        runTest {
+            `when`(
+                localGitHubDatabaseRepository.getSelectedGitHubRepositoryFromDatabase()
+            ).thenReturn(flowOf(GitHubResponse.Success(testGitHubRepository)))
 
-        `when`(
-            localGitHubDatabaseRepository.getSelectedGitHubRepositoryFromDatabase(
-                testGitHubRepository.id
+            viewModel = GitHubRepositoryInfoViewModel(
+                localGitHubDatabaseRepository = localGitHubDatabaseRepository
             )
-        ).thenReturn(flowOf(GitHubResponse.Success(testGitHubRepository)))
 
-        viewModel = GitHubRepositoryInfoViewModel(
-            savedStateHandle = savedStateHandle,
-            localGitHubDatabaseRepository = localGitHubDatabaseRepository,
-            logger = logger
-        )
+            val gitHubRepositoryInfoFlow: Flow<GitHubResponse<LocalGitHubRepository?>> =
+                viewModel.gitHubRepositoryInfo
 
-        val gitHubRepositoryInfoFlow: Flow<GitHubResponse<LocalGitHubRepository?>>? =
-            viewModel.gitHubRepositoryInfo
-
-        assertNotNull(gitHubRepositoryInfoFlow)
-        // If repoInfoFlow is not null, collect its values
-        gitHubRepositoryInfoFlow?.collect { gitHubRepositoryInfo ->
-            // Verify that the repoInfo value matches the expected value
-            assertTrue(gitHubRepositoryInfo is GitHubResponse.Success)
-            assertEquals(GitHubResponse.Success(testGitHubRepository), gitHubRepositoryInfo)
+            assertNotNull(gitHubRepositoryInfoFlow)
+            // If gitHubRepositoryInfoFlow is not null, collect its values
+            gitHubRepositoryInfoFlow.collect { gitHubRepositoryInfo ->
+                // Verify that the gitHubRepositoryInfo value matches the expected value
+                assertTrue(gitHubRepositoryInfo is GitHubResponse.Success)
+                assertEquals(GitHubResponse.Success(testGitHubRepository), gitHubRepositoryInfo)
+            }
         }
-    }
 
     /**
      * This test verifies that if an error occurs while fetching data from the
@@ -98,48 +83,51 @@ class GitHubRepositoryInfoViewModelTest {
     fun `error from getSelectedGitHubRepositoryFromDatabase should emit error response`() =
         runTest {
             val errorMessage = "Error"
-            `when`(savedStateHandle.get<Long>(ARGUMENT_GITHUB_REPO_ID))
-                .thenReturn(testGitHubRepository.id)
-
             `when`(
-                localGitHubDatabaseRepository.getSelectedGitHubRepositoryFromDatabase(
-                    testGitHubRepository.id
-                )
+                localGitHubDatabaseRepository.getSelectedGitHubRepositoryFromDatabase()
             ).thenReturn(flowOf(GitHubResponse.Error(errorMessage)))
 
             viewModel = GitHubRepositoryInfoViewModel(
-                savedStateHandle = savedStateHandle,
-                localGitHubDatabaseRepository = localGitHubDatabaseRepository,
-                logger = logger
+                localGitHubDatabaseRepository = localGitHubDatabaseRepository
             )
 
-            val gitHubRepositoryInfoFlow: Flow<GitHubResponse<LocalGitHubRepository?>>? =
+            val gitHubRepositoryInfoFlow: Flow<GitHubResponse<LocalGitHubRepository?>> =
                 viewModel.gitHubRepositoryInfo
 
             assertNotNull(gitHubRepositoryInfoFlow)
-            // If repoInfoFlow is not null, collect its values
-            gitHubRepositoryInfoFlow?.collect { gitHubRepositoryInfo ->
-                // Verify that the repoInfo value matches the expected value
+            // If gitHubRepositoryInfoFlow is not null, collect its values
+            gitHubRepositoryInfoFlow.collect { gitHubRepositoryInfo ->
+                // Verify that the gitHubRepositoryInfo value matches the expected value
                 assertTrue(gitHubRepositoryInfo is GitHubResponse.Error)
                 assertEquals(GitHubResponse.Error(errorMessage), gitHubRepositoryInfo)
             }
         }
 
     /**
-     * This test verifies that if the `ARGUMENT_GITHUB_REPO_ID` argument is missing
-     * from the `savedStateHandle`, the ViewModel sets the `gitHubRepositoryInfo` flow to null.
+     * This test verifies that if no github repository is saved in room database
+     * the ViewModel emits a success response containing null `LocalGitHubRepository`.
      */
     @Test()
-    fun `null github repository id argument should set null flow`() = runTest {
-        `when`(savedStateHandle.get<Long>(ARGUMENT_GITHUB_REPO_ID)).thenReturn(null)
-        viewModel = GitHubRepositoryInfoViewModel(
-            savedStateHandle = savedStateHandle,
-            localGitHubDatabaseRepository = localGitHubDatabaseRepository,
-            logger = logger
-        )
-        val gitHubRepositoryInfoFlow: Flow<GitHubResponse<LocalGitHubRepository?>>? =
-            viewModel.gitHubRepositoryInfo
+    fun `getSelectedGitHubRepositoryFromDatabase should emit null if github repository is not found`() =
+        runTest {
+            `when`(
+                localGitHubDatabaseRepository.getSelectedGitHubRepositoryFromDatabase()
+            ).thenReturn(flowOf(GitHubResponse.Success(null)))
 
-        assertNull(gitHubRepositoryInfoFlow)
-    }
+            viewModel = GitHubRepositoryInfoViewModel(
+                localGitHubDatabaseRepository = localGitHubDatabaseRepository
+            )
+
+            val gitHubRepositoryInfoFlow: Flow<GitHubResponse<LocalGitHubRepository?>> =
+                viewModel.gitHubRepositoryInfo
+
+            assertNotNull(gitHubRepositoryInfoFlow)
+
+            // If gitHubRepositoryInfoFlow is not null, collect its values
+            gitHubRepositoryInfoFlow.collect { gitHubRepositoryInfo ->
+                // Verify that the gitHubRepositoryInfo value matches the expected value
+                assertTrue(gitHubRepositoryInfo is GitHubResponse.Success)
+                assertEquals(GitHubResponse.Success(null), gitHubRepositoryInfo)
+            }
+        }
 }

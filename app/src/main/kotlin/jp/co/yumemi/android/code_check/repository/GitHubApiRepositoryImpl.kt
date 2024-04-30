@@ -4,6 +4,7 @@ import android.util.Log
 import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
 import jp.co.yumemi.android.code_check.constant.ResponseCode.IOEXCEPTION
 import jp.co.yumemi.android.code_check.constant.ResponseCode.TIMEOUT_EXCEPTION
+import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.service.GitHubApiService
@@ -19,8 +20,10 @@ import javax.inject.Inject
  * Implementation of the [GitHubApiRepository] interface that interacts with the GitHub API using a provided
  * [GitHubApiService] instance (injected through Dagger).
  */
-class GitHubApiRepositoryImpl @Inject constructor(private val gitHubApiService: GitHubApiService) :
-    GitHubApiRepository {
+class GitHubApiRepositoryImpl @Inject constructor(
+    private val gitHubApiService: GitHubApiService,
+    private val logger: Logger
+) : GitHubApiRepository {
     // Logging tag for this class
     private val TAG = this::class.java.simpleName
 
@@ -59,23 +62,23 @@ class GitHubApiRepositoryImpl @Inject constructor(private val gitHubApiService: 
                             "Failed to search GitHub repositories for keyword $inputText: ${
                                 response.errorBody()?.string()
                             }"
-                        Log.e(TAG, errorMessage)
+                        logger.error(TAG, errorMessage,null)
                     }
                 } catch (ex: IOException) {
                     // Emit a failure result for network errors
                     emit(GitHubResponse.Error(IOEXCEPTION))
                     val errorMessage = "Network error occurred: ${ex.message}"
-                    Log.e(TAG, errorMessage, ex)
+                    logger.error(TAG, errorMessage, ex)
                 } catch (ex: SocketTimeoutException) {
                     // Emit a failure result for connection timeout errors
                     emit(GitHubResponse.Error(TIMEOUT_EXCEPTION))
                     val errorMessage = "Connection timed out: ${ex.message}"
-                    Log.e(TAG, errorMessage, ex)
+                    logger.error(TAG, errorMessage, ex)
                 } catch (ex: Exception) {
                     // Emit a failure result for unexpected errors
                     emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage = "An unexpected error occurred: ${ex.message}"
-                    Log.e(TAG, errorMessage, ex)
+                    logger.error(TAG, errorMessage, ex)
                 }
             }
         }

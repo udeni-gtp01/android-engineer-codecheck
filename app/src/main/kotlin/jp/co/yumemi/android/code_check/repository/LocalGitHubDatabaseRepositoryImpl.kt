@@ -3,6 +3,7 @@ package jp.co.yumemi.android.code_check.repository
 import android.util.Log
 import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
 import jp.co.yumemi.android.code_check.database.GitHubRepositoryDao
+import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +17,8 @@ import javax.inject.Inject
  * Room database using the provided `gitHubRepositoryDao` to save and retrieve GitHub repository data.
  */
 class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
-    private val gitHubRepositoryDao: GitHubRepositoryDao
+    private val gitHubRepositoryDao: GitHubRepositoryDao,
+    private val logger: Logger
 ) : LocalGitHubDatabaseRepository {
     // Logging tag for this class
     private val TAG = this::class.java.simpleName
@@ -46,7 +48,7 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                     emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage =
                         "An unexpected error occurred while saving selected github repository: ${ex.message}"
-                    Log.e(TAG, errorMessage, ex)
+                    logger.error(TAG, errorMessage, ex)
                 }
             }
         }
@@ -73,7 +75,7 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                 emit(GitHubResponse.Error(EXCEPTION))
                 val errorMessage =
                     "An unexpected error occurred while retrieving selected github repository: ${ex.message}"
-                Log.e(TAG, errorMessage, ex)
+                logger.error(TAG, errorMessage, ex)
             }
         }
     }
