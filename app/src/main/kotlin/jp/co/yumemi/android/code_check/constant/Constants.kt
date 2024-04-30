@@ -35,6 +35,12 @@ object DatabaseConstant {
      * Constant string representing the name of the table in the database that stores information
      * about selected GitHub repository to view info.
      */
+    const val ROOM_GITHUB_REPO_DB_NAME = "github_repo_db"
+
+    /**
+     * Constant string representing the name of the table in the database that stores information
+     * about selected GitHub repository to view info.
+     */
     const val ROOM_GITHUB_REPO_TABLE_NAME = "github_repo_table"
 }
 

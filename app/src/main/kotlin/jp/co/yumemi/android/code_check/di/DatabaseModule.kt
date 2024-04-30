@@ -6,9 +6,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import jp.co.yumemi.android.code_check.constant.DatabaseConstant.ROOM_GITHUB_REPO_DB_NAME
 import jp.co.yumemi.android.code_check.constant.DatabaseConstant.ROOM_GITHUB_REPO_TABLE_NAME
 import jp.co.yumemi.android.code_check.database.AppDatabase
 import jp.co.yumemi.android.code_check.database.GitHubRepositoryDao
+import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.repository.LocalGitHubDatabaseRepository
 import jp.co.yumemi.android.code_check.repository.LocalGitHubDatabaseRepositoryImpl
 import javax.inject.Singleton
@@ -31,7 +33,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             application,
             AppDatabase::class.java,
-            ROOM_GITHUB_REPO_TABLE_NAME
+            ROOM_GITHUB_REPO_DB_NAME
         ).fallbackToDestructiveMigration().build()
     }
 
@@ -57,7 +59,10 @@ object DatabaseModule {
      */
     @Singleton
     @Provides
-    fun provideLocalGitHubDatabaseRepository(gitHubRepositoryDao: GitHubRepositoryDao): LocalGitHubDatabaseRepository {
-        return LocalGitHubDatabaseRepositoryImpl(gitHubRepositoryDao)
+    fun provideLocalGitHubDatabaseRepository(
+        gitHubRepositoryDao: GitHubRepositoryDao,
+        logger: Logger
+    ): LocalGitHubDatabaseRepository {
+        return LocalGitHubDatabaseRepositoryImpl(gitHubRepositoryDao = gitHubRepositoryDao, logger = logger)
     }
 }

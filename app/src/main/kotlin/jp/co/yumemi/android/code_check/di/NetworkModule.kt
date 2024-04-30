@@ -114,8 +114,11 @@ object NetworkModule {
      */
     @Singleton
     @Provides
-    fun provideGitHubApiRepository(gitHubApiService: GitHubApiService): GitHubApiRepository {
-        return GitHubApiRepositoryImpl(gitHubApiService)
+    fun provideGitHubApiRepository(
+        gitHubApiService: GitHubApiService,
+        logger: Logger
+    ): GitHubApiRepository {
+        return GitHubApiRepositoryImpl(gitHubApiService = gitHubApiService, logger = logger)
     }
 
     /**
