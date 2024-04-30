@@ -47,10 +47,10 @@ class HomeViewModel @Inject constructor(
     val gitHubSearchResultState: StateFlow<GitHubResponse<GitHubRepositoryList>> =
         _gitHubSearchResultState
 
-    private val _isSavedSelectedGitHubRepositoryState =
-        MutableStateFlow<GitHubResponse<Boolean>>(GitHubResponse.Success(true))
-    val isSavedSelectedGitHubRepositoryState: StateFlow<GitHubResponse<Boolean>> =
-        _isSavedSelectedGitHubRepositoryState
+    private val _isSelectedGitHubRepositorySavedState =
+        MutableStateFlow<GitHubResponse<Boolean>>(GitHubResponse.Loading)
+    val isSelectedGitHubRepositorySavedState: StateFlow<GitHubResponse<Boolean>> =
+        _isSelectedGitHubRepositorySavedState
 
     //  Two-way data binding property for the user's search keyword.
     var searchKeyword by mutableStateOf("")
@@ -61,6 +61,7 @@ class HomeViewModel @Inject constructor(
      *  - Otherwise, it fetches repositories using the injected [gitHubApiRepository] and updates the UI accordingly.
      */
     fun searchGitHubRepositories() {
+        _gitHubSearchResultState.value = GitHubResponse.Loading
         if (searchKeyword.isBlank()) {
             _gitHubSearchResultState.value =
                 GitHubResponse.Success(GitHubRepositoryList(emptyList()))
@@ -102,10 +103,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun saveSelectedGitHubRepositoryInDatabase(gitHubRepository: GitHubRepository) {
+        _isSelectedGitHubRepositorySavedState.value = GitHubResponse.Loading
         viewModelScope.launch {
             try {
                 val localGitHubRepository = LocalGitHubRepository(
-                    id = gitHubRepository.id,
                     forksCount = gitHubRepository.forksCount,
                     language = gitHubRepository.language,
                     name = gitHubRepository.name,
@@ -119,10 +120,10 @@ class HomeViewModel @Inject constructor(
                 localGitHubDatabaseRepository.saveSelectedGitHubRepositoryInDatabase(
                     localGitHubRepository
                 ).flowOn(Dispatchers.IO).collect {
-                    _isSavedSelectedGitHubRepositoryState.value = it
+                    _isSelectedGitHubRepositorySavedState.value = it
                 }
             } catch (ex: Exception) {
-                _isSavedSelectedGitHubRepositoryState.value = GitHubResponse.Error(EXCEPTION)
+                _isSelectedGitHubRepositorySavedState.value = GitHubResponse.Error(EXCEPTION)
                 Log.e(
                     TAG,
                     ex.message

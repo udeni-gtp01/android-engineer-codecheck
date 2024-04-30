@@ -32,7 +32,7 @@ object DatabaseModule {
             application,
             AppDatabase::class.java,
             ROOM_GITHUB_REPO_TABLE_NAME
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     /**

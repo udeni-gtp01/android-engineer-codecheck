@@ -40,13 +40,13 @@ fun GitHubRepositoryInfoScreen(
     modifier: Modifier = Modifier,
     gitHubRepositoryInfoViewModel: GitHubRepositoryInfoViewModel = hiltViewModel()
 ) {
-    val repositoryState =
-        gitHubRepositoryInfoViewModel.gitHubRepositoryInfo?.collectAsState(initial = null)
+    val gitHubRepositoryInfoState =
+        gitHubRepositoryInfoViewModel.gitHubRepositoryInfo.collectAsState(initial = null)
 
-    repositoryState?.let {
-        it.value?.let { repositoryState ->
-            MainInfoSection(
-                repositoryState = repositoryState,
+    gitHubRepositoryInfoState.let {
+        it.value?.let { repositoryInfoState ->
+            GitHubRepositoryMainInfoSection(
+                repositoryInfoState = repositoryInfoState,
                 modifier = modifier
             )
         }
@@ -54,19 +54,18 @@ fun GitHubRepositoryInfoScreen(
 }
 
 @Composable
-fun MainInfoSection(
-    repositoryState: GitHubResponse<LocalGitHubRepository?>,
+fun GitHubRepositoryMainInfoSection(
+    repositoryInfoState: GitHubResponse<LocalGitHubRepository?>,
     modifier: Modifier = Modifier,
 ) {
-    if (repositoryState is GitHubResponse.Success) {
-        val repository = repositoryState
-        repository.data?.let {
+    if (repositoryInfoState is GitHubResponse.Success) {
+        repositoryInfoState.data?.let {
             LazyColumn(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
             ) {
                 item {
-                    ImageSection(ownerAvatarUrl = repository.data.ownerAvatarUrl)
+                    ImageSection(ownerAvatarUrl = repositoryInfoState.data.ownerAvatarUrl)
                 }
                 item {
                     InfoSection(repository = it)

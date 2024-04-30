@@ -29,13 +29,17 @@ interface LocalGitHubDatabaseRepository {
     suspend fun saveSelectedGitHubRepositoryInDatabase(localGitHubRepository: LocalGitHubRepository): Flow<GitHubResponse<Boolean>>
 
     /**
-     * Retrieves a selected GitHub repository from the Room database based on its ID.
+     * Fetches a `LocalGitHubRepository` object from the database based on primary key [oneId].
+     * This `LocalGitHubRepository` is the github repository selected by user to see more info.
+     *
+     * Since the table contains only one row to store the most recently selected github repository
+     * that has fixed value (`1`) as the primary key [oneId], `1` has been passed to retrieve the [LocalGitHubRepository]
      *
      * @param selectedGitHubRepositoryId The ID of the repository to be retrieved.
      * @return A `Flow` of `GitHubResponse<LocalGitHubRepository?>` objects. The emitted responses indicate the outcome:
-     *   - `Success` containing a `LocalGitHubRepository` object representing the retrieved repository,
-     *     or null if no repository with the provided ID is found.
+     *   - `Success` containing a `LocalGitHubRepository` object representing the retrieved github repository,
+     *     or null if no github repository is found.
      *   - `Error` containing an error message if any exception occurred during the retrieval process.
      */
-    fun getSelectedGitHubRepositoryFromDatabase(selectedGitHubRepositoryId: Long): Flow<GitHubResponse<LocalGitHubRepository?>>
+    fun getSelectedGitHubRepositoryFromDatabase(): Flow<GitHubResponse<LocalGitHubRepository?>>
 }

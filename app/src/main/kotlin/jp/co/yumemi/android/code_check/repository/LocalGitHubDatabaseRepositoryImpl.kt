@@ -53,19 +53,21 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Retrieves a selected GitHub repository from the Room database based on its ID.
+     * Retrieves a selected GitHub repository from the [LocalGitHubRepository] table in Room database.
+     * The [LocalGitHubRepository] table contains only one row to store the most recently selected
+     * github repository and that has fixed value (`1`) as the primary key.
      *
-     * @param selectedGitHubRepositoryId The ID of the repository to be retrieved.
-     * @return A `Flow` of `GitHubResponse<LocalGitHubRepository?>` objects. The emitted responses indicate the outcome:
-     *   - `Success` containing a `LocalGitHubRepository` object representing the retrieved repository,
-     *     or null if no repository with the provided ID is found.
+     * @return A `Flow` of `GitHubResponse<LocalGitHubRepository?>` object.
+     * The emitted responses indicate the outcome:
+     *   - `Success` containing a `LocalGitHubRepository` object representing the retrieved github repository,
+     *     or null if no github repository is found.
      *   - `Error` containing an error message if any exception occurred during the retrieval process.
      */
-    override fun getSelectedGitHubRepositoryFromDatabase(selectedGitHubRepositoryId: Long): Flow<GitHubResponse<LocalGitHubRepository?>> {
+    override fun getSelectedGitHubRepositoryFromDatabase(): Flow<GitHubResponse<LocalGitHubRepository?>> {
         return flow {
             try {
                 val response =
-                    gitHubRepositoryDao.getGitHubRepositoryById(selectedGitHubRepositoryId)
+                    gitHubRepositoryDao.getSelectedGitHubRepository()
                 emit(GitHubResponse.Success(response))
             } catch (ex: Exception) {
                 emit(GitHubResponse.Error(EXCEPTION))
