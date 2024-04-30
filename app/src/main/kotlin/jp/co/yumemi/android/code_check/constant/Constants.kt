@@ -32,8 +32,8 @@ object ApiEndpoint {
  */
 object DatabaseConstant {
     /**
-     * Constant string representing the name of the table in the database that stores information
-     * about selected GitHub repository to view info.
+     * Constant string representing the name of the database that stores information
+     * about GitHub repositories.
      */
     const val ROOM_GITHUB_REPO_DB_NAME = "github_repo_db"
 
@@ -50,10 +50,6 @@ object DatabaseConstant {
  * consistency across the application.
  */
 object NavigationArgument {
-    /**
-     * The key used to access the GitHub repository ID argument passed during navigation.
-     */
-    const val ARGUMENT_GITHUB_REPO_ID = "gitHubRepoId"
 
     /**
      * The constant representing app home destination.
