@@ -71,9 +71,6 @@ object NavigationArgument {
  * to aid in error handling and interpretation of network responses.
  */
 object ResponseCode {
-    /** HTTP response status codes for 'OK' success response */
-    const val STATUS_CODE_200 = "200"
-
     /** HTTP response status codes for 'Validation failed, or the endpoint has been spammed' error response */
     const val STATUS_CODE_422 = "422"
 
