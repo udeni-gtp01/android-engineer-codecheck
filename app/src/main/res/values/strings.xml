@@ -17,10 +17,11 @@
     <string name="retry">Retry</string>
     <string name="no_result">No Results</string>
     <string name="oh_no">Oh no!</string>
-    <string name="no_internet">No Internet found. Check your connection or try again.
-    </string>
-    <string name="invalid_request">Error occurred. Check entered repository name or try again.
-    </string>
+    <string name="no_internet">No Internet found. Please check your connection or try again.</string>
+    <string name="invalid_request">Error occurred. Please check entered repository name and try again.</string>
+    <string name="service_unavailable">Error occurred. Service unavailable, please try again later.</string>
+    <string name="general_error">Error occurred. Something went wrong, please try again.</string>
+    <string name="timeout_error">Error occurred. Looks like it is taking longer than usual. Please check your connection and try again.</string>
     <string name="loading">Loading</string>
     <string name="go_to_repository">Go to Repository</string>
 </resources>

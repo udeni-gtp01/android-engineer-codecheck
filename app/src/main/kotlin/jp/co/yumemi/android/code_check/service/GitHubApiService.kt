@@ -1,6 +1,6 @@
 package jp.co.yumemi.android.code_check.service
 
-import jp.co.yumemi.android.code_check.constant.Constant
+import jp.co.yumemi.android.code_check.constant.ApiEndpoint
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryList
 import retrofit2.Response
 import retrofit2.http.GET
@@ -17,6 +17,6 @@ interface GitHubApiService {
      * @param keyWord The keyword to use for searching repositories on GitHub.
      * @return A [Response] object representing the outcome of the search request.
      */
-    @GET(Constant.ENDPOINT_GITHUB_REPOSITORIES)
+    @GET(ApiEndpoint.ENDPOINT_GITHUB_REPOSITORIES)
     suspend fun searchRepositories(@Query("q") keyWord: String): Response<GitHubRepositoryList>
 }

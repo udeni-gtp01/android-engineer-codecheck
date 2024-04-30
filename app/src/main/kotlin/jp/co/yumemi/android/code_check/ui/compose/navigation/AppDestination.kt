@@ -1,5 +1,8 @@
 package jp.co.yumemi.android.code_check.ui.compose.navigation
 
+import jp.co.yumemi.android.code_check.constant.NavigationArgument.DESTINATION_GITHUB_REPO_INFO
+import jp.co.yumemi.android.code_check.constant.NavigationArgument.DESTINATION_HOME
+
 /**
  * An interface that represents a navigation destination in the app.
  */
@@ -13,13 +16,16 @@ interface AppDestination {
 /**
  * An object representing the GitHub Repository List destination.
  */
-object GithubRepositoryList : AppDestination {
-    override val route = "repo_list"
+object HomeDestination : AppDestination {
+    override val route = DESTINATION_HOME
 }
 
 /**
  * An object representing the GitHub Repository Preview destination.
  */
-object GithubRepositoryPreview : AppDestination {
-    override val route = "repo_preview"
+object GitHubRepositoryInfoDestination : AppDestination {
+    /**
+     * The route to the GitHub repository info screen.
+     */
+    override val route = DESTINATION_GITHUB_REPO_INFO
 }

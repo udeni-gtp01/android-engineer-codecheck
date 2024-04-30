@@ -26,10 +26,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -39,71 +41,86 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.GitHubRepository
 import jp.co.yumemi.android.code_check.model.GitHubRepositoryOwner
 import jp.co.yumemi.android.code_check.model.GitHubResponse
-import jp.co.yumemi.android.code_check.viewModel.HomeSharedViewModel
+import jp.co.yumemi.android.code_check.viewModel.HomeViewModel
 
 /**
  * Composable function representing the main screen of the app.
  *
- * @param onRepositoryItemClicked Callback function when a repository item is clicked.
- * @param githubRepoViewModel The ViewModel for managing data and interactions.
+ * @param navigateToGitHubRepositoryInfo Callback function when a repository item is clicked.
  * @param modifier Modifier for customizing the layout.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
-    onRepositoryItemClicked: () -> Unit,
-    homeSharedViewModel: HomeSharedViewModel,
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    navigateToGitHubRepositoryInfo: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val gitHubApiResult by homeSharedViewModel.gitHubApiResult.observeAsState(initial = null)
+    val gitHubSearchResultState = homeViewModel.gitHubSearchResultState.collectAsState()
+    val isSelectedGitHubRepositorySavedState =
+        homeViewModel.isSelectedGitHubRepositorySavedState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    // State variable to hold the navigation condition
+    var shouldNavigateToGitHubRepositoryInfo by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
             .padding(dimensionResource(id = R.dimen.dp_10))
     ) {
         SearchSection(
-            searchKeyword = homeSharedViewModel.searchKeyword,
-            onSearchKeywordChange = { homeSharedViewModel.updateSearchKeyword(it) },
+            searchKeyword = homeViewModel.searchKeyword,
+            onSearchKeywordChange = { homeViewModel.updateSearchKeyword(it) },
             onSearchClicked = {
                 keyboardController?.hide()
-                homeSharedViewModel.searchGitHubRepositories()
+                homeViewModel.searchGitHubRepositories()
             },
-            onClearButtonClicked = { homeSharedViewModel.clearSearchKeyword() },
+            onClearButtonClicked = { homeViewModel.clearSearchKeyword() },
         )
 
-        when (gitHubApiResult) {
+        when (gitHubSearchResultState.value) {
             is GitHubResponse.Loading -> {
                 LoadingScreen()
             }
 
             is GitHubResponse.Error -> {
                 ErrorScreen(
-                    errorTitle = stringResource(id = R.string.oh_no),
-                    errorMessage = stringResource(id = R.string.invalid_request),
-                    onRetryButtonClicked = { homeSharedViewModel.searchGitHubRepositories() })
-            }
-
-            is GitHubResponse.Error -> {
-                ErrorScreen(
-                    errorTitle = stringResource(id = R.string.oh_no),
-                    errorMessage = stringResource(id = R.string.no_internet),
-                    onRetryButtonClicked = { homeSharedViewModel.searchGitHubRepositories() })
-            }
-
-            else -> {
-                SearchResultSection(
-                    repositoryList = homeSharedViewModel.getRepositoryList(),
-                    onRepositoryItemClicked = { selectedRepository ->
-                        homeSharedViewModel.setRepository(selectedRepository)
-                        onRepositoryItemClicked()
-                    },
+                    errorTitle = R.string.oh_no,
+                    errorCode = (gitHubSearchResultState.value as GitHubResponse.Error).error,
+                    onRetryButtonClicked = { homeViewModel.searchGitHubRepositories() }
                 )
             }
+
+            is GitHubResponse.Success -> {
+                val gitHubSearchResult = gitHubSearchResultState.value as GitHubResponse.Success
+                SearchResultSection(
+                    repositoryList = gitHubSearchResult.data.items,
+                    onGitHubRepositoryClicked = { selectedGitHubRepository ->
+                        homeViewModel.saveSelectedGitHubRepositoryInDatabase(
+                            selectedGitHubRepository
+                        )
+                        shouldNavigateToGitHubRepositoryInfo = true
+                    }
+                )
+            }
+        }
+    }
+
+    // Check if navigation is required and perform navigation
+    if (shouldNavigateToGitHubRepositoryInfo) {
+        if (isSelectedGitHubRepositorySavedState.value is GitHubResponse.Success) {
+            navigateToGitHubRepositoryInfo()
+            shouldNavigateToGitHubRepositoryInfo = false // Reset flag after navigation
+        } else if (isSelectedGitHubRepositorySavedState.value is GitHubResponse.Error) {
+            ErrorScreen(
+                errorTitle = R.string.oh_no,
+                errorCode = (gitHubSearchResultState.value as GitHubResponse.Error).error,
+                onRetryButtonClicked = { homeViewModel.searchGitHubRepositories() }
+            )
         }
     }
 }
@@ -203,12 +220,12 @@ fun ClearButton(onClearButtonClicked: () -> Unit) {
  * Composable function for displaying the repository list search result.
  *
  * @param repositoryList List of repository items.
- * @param onRepositoryItemClicked Callback function when a single repository list item is clicked.
+ * @param onGitHubRepositoryClicked Callback function when a single repository list item is clicked.
  */
 @Composable
 fun SearchResultSection(
     repositoryList: List<GitHubRepository>,
-    onRepositoryItemClicked: (GitHubRepository) -> Unit,
+    onGitHubRepositoryClicked: (GitHubRepository) -> Unit,
 ) {
     if (repositoryList.isEmpty()) {
         Column(
@@ -229,7 +246,7 @@ fun SearchResultSection(
             items(items = repositoryList) {
                 RepositoryListItem(
                     githubRepository = it,
-                    onRepositoryItemClicked = onRepositoryItemClicked
+                    onGitHubRepositoryClicked = onGitHubRepositoryClicked
                 )
             }
         }
@@ -240,16 +257,16 @@ fun SearchResultSection(
  * Composable function for displaying a single repository item.
  *
  * @param githubRepository The repository item to display.
- * @param onRepositoryItemClicked Callback function when this item is clicked.
+ * @param onGitHubRepositoryClicked Callback function when this item is clicked.
  */
 @Composable
 fun RepositoryListItem(
     githubRepository: GitHubRepository,
-    onRepositoryItemClicked: (GitHubRepository) -> Unit
+    onGitHubRepositoryClicked: (GitHubRepository) -> Unit
 ) {
     Column(
         modifier = Modifier
-            .clickable { onRepositoryItemClicked(githubRepository) }
+            .clickable { onGitHubRepositoryClicked(githubRepository) }
             .fillMaxWidth()
             .border(
                 width = dimensionResource(R.dimen.dp_1),

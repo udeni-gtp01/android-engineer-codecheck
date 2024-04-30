@@ -24,7 +24,7 @@ sealed class GitHubResponse<out T> {
      *
      * @property message An optional message explaining the error (can be null).
      */
-    data class Error(val message: String?) : GitHubResponse<Nothing>()
+    data class Error(val error: String?) : GitHubResponse<Nothing>()
 
     /**
      * Represents the state when a GitHub API call is still in progress and data is not yet available.
