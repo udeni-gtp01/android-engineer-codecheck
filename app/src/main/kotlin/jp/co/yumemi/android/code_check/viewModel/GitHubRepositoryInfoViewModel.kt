@@ -1,10 +1,7 @@
 package jp.co.yumemi.android.code_check.viewModel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jp.co.yumemi.android.code_check.constant.NavigationArgument.ARGUMENT_GITHUB_REPO_ID
-import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
 import jp.co.yumemi.android.code_check.repository.LocalGitHubDatabaseRepository

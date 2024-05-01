@@ -60,6 +60,11 @@ object NavigationArgument {
      * The constant representing github repository info destination.
      */
     const val DESTINATION_GITHUB_REPO_INFO = "repo_info"
+
+    /**
+     * The constant representing github repository info destination.
+     */
+    const val DESTINATION_MY_SAVED_LIST = "saved_list"
 }
 
 /**

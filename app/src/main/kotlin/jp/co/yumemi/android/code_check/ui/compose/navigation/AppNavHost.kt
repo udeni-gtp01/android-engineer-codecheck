@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import jp.co.yumemi.android.code_check.ui.compose.GitHubRepositoryInfoScreen
 import jp.co.yumemi.android.code_check.ui.compose.HomeScreen
+import jp.co.yumemi.android.code_check.ui.compose.MySavedListScreen
 
 /**
  * Composable function responsible for hosting the navigation flow of the app.
@@ -33,6 +34,11 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
                         GitHubRepositoryInfoDestination.route
                     )
                 },
+                onMySavedListButtonClick = {
+                    navController.navigateSingleTopTo(
+                        MySavedListDestination.route
+                    )
+                },
                 modifier = modifier,
             )
         }
@@ -46,6 +52,19 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
              * @param modifier Additional modifier to be applied to the composable.
              */
             GitHubRepositoryInfoScreen(
+                modifier = modifier
+            )
+        }
+        composable(
+            route = MySavedListDestination.route,
+        ) {
+            /**
+             * The composable screen for displaying GitHub repositories saved in the database for later reference.
+             * This screen is accessible by navigating to the route `${MySavedListDestination.route}/`
+             *
+             * @param modifier Additional modifier to be applied to the composable.
+             */
+            MySavedListScreen(
                 modifier = modifier
             )
         }
