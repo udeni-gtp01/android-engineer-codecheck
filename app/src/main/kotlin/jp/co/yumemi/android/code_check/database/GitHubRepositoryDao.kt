@@ -19,7 +19,7 @@ import jp.co.yumemi.android.code_check.model.SavedGitHubRepository
 interface GitHubRepositoryDao {
     /**
      * Inserts a new `LocalGitHubRepository` object into the database to represent the
-     * GitHub repository selected by user to see more info from search results list or my saved list.
+     * GitHub repository selected by user to see more info from search results list or user's saved list.
      * If a record with the same [oneId] (primary key '1') already exists, it is replaced using the provided object.
      *
      * @param localGitHubRepository The `LocalGitHubRepository` object to be inserted.
@@ -43,7 +43,7 @@ interface GitHubRepositoryDao {
 
     /**
      * Inserts a new `SavedGitHubRepository` object into the database to represent the
-     * GitHub repository added to My saved list in the database.
+     * GitHub repository added to user's saved list in the database.
      *
      * @param savedGitHubRepository The `SavedGitHubRepository` object to be inserted.
      */
@@ -52,7 +52,7 @@ interface GitHubRepositoryDao {
 
     /**
      * Delete inserted `SavedGitHubRepository` object from the database. Then the deleted
-     * GitHub repository will not be shown in My saved list.
+     * GitHub repository will not be shown in user's saved list.
      *
      * @param savedGitHubRepository The `SavedGitHubRepository` object to be deleted.
      */
@@ -61,10 +61,10 @@ interface GitHubRepositoryDao {
 
     /**
      * Fetches a list of `SavedGitHubRepository` objects from the database
-     * representing the My saved list of GitHub repositories.
-     * This `SavedGitHubRepository` represents a GitHub repository added to My saved list.
+     * representing the user's saved list of GitHub repositories.
+     * This `SavedGitHubRepository` represents a GitHub repository added to user's saved list.
      *
-     * @return A a list of [SavedGitHubRepository] objects representing My saved list.
+     * @return A a list of [SavedGitHubRepository] objects representing user's saved list.
      */
     @Query("SELECT * FROM $ROOM_MY_SAVED_REPO_TABLE_NAME")
     fun getSavedGitHubRepositories(): List<SavedGitHubRepository>

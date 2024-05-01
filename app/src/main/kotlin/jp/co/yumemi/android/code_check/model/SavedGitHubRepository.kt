@@ -19,7 +19,7 @@ import jp.co.yumemi.android.code_check.constant.DatabaseConstant
  *  @param htmlUrl: The URL to the GitHub repository's HTML page on GitHub (nullable).
  *  @param ownerLogin: The username of the GitHub repository owner (nullable).
  *  @param ownerAvatarUrl: The URL to the owner's avatar image (nullable).
- *  @param isFavorite: An additional field to track whether the user has favorite the GitHub repository). Defaults to `false`.
+ *  @param isSaved: To track whether the user has added the GitHub repository to user's saved list.
  *
  *  `@Entity(tableName = ROOM_MY_SAVED_REPO_TABLE_NAME)`: This annotation marks this class as a Room entity,
  *   mapping it to a table named "my_saved_repo_table" within the Room database.
@@ -36,5 +36,27 @@ data class SavedGitHubRepository(
     val htmlUrl: String?,
     val ownerLogin: String?,
     val ownerAvatarUrl: String?,
-    val isFavorite: Boolean = false
+    val isSaved: Boolean
 )
+
+/**
+ * Converts a [SavedGitHubRepository] object to a corresponding [LocalGitHubRepository] object.
+ *
+ * @param isSaved Boolean indicating whether the repository is saved in the user's saved list in local database.
+ * @return A [LocalGitHubRepository] object with properties copied from the [SavedGitHubRepository] object.
+ */
+fun SavedGitHubRepository.toLocalGitHubRepository(): LocalGitHubRepository {
+    return LocalGitHubRepository(
+        id = this.id,
+        forksCount = this.forksCount,
+        language = this.language,
+        name = this.name,
+        openIssuesCount = this.openIssuesCount,
+        stargazersCount = this.stargazersCount,
+        watchersCount = this.watchersCount,
+        htmlUrl = this.htmlUrl,
+        ownerLogin = this.ownerLogin,
+        ownerAvatarUrl = this.ownerAvatarUrl,
+        isSaved = isSaved
+    )
+}

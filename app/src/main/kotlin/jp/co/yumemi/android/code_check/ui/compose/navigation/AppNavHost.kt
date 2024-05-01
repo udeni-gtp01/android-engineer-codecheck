@@ -65,6 +65,11 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
              * @param modifier Additional modifier to be applied to the composable.
              */
             MySavedListScreen(
+                navigateToGitHubRepositoryInfo = {
+                    navController.navigateSingleTopTo(
+                        GitHubRepositoryInfoDestination.route
+                    )
+                },
                 modifier = modifier
             )
         }

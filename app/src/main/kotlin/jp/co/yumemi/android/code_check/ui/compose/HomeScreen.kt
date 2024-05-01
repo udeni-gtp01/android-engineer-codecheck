@@ -19,10 +19,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,9 +53,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.model.GitHubRepository
-import jp.co.yumemi.android.code_check.model.GitHubRepositoryOwner
 import jp.co.yumemi.android.code_check.model.GitHubResponse
+import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
 import jp.co.yumemi.android.code_check.viewModel.HomeViewModel
 
 /**
@@ -76,7 +77,9 @@ fun HomeScreen(
 
     // State variable to hold the navigation condition
     var shouldNavigateToGitHubRepositoryInfo by remember { mutableStateOf(false) }
-
+    LaunchedEffect(gitHubSearchResultState) {
+        homeViewModel.getRecentUpdateFromDatabase()
+    }
     Scaffold(
         topBar = {
             GithubRepoAppTopAppBar()
@@ -115,7 +118,7 @@ fun HomeScreen(
                 is GitHubResponse.Success -> {
                     val gitHubSearchResult = gitHubSearchResultState.value as GitHubResponse.Success
                     SearchResultSection(
-                        repositoryList = gitHubSearchResult.data.items,
+                        repositoryList = gitHubSearchResult.data,
                         onGitHubRepositoryClicked = { selectedGitHubRepository ->
                             homeViewModel.saveSelectedGitHubRepositoryInDatabase(
                                 selectedGitHubRepository
@@ -263,8 +266,8 @@ fun ClearButton(onClearButtonClicked: () -> Unit) {
  */
 @Composable
 fun SearchResultSection(
-    repositoryList: List<GitHubRepository>,
-    onGitHubRepositoryClicked: (GitHubRepository) -> Unit,
+    repositoryList: List<LocalGitHubRepository>,
+    onGitHubRepositoryClicked: (LocalGitHubRepository) -> Unit,
 ) {
     if (repositoryList.isEmpty()) {
         Column(
@@ -286,7 +289,7 @@ fun SearchResultSection(
         ) {
             items(items = repositoryList) {
                 RepositoryListItem(
-                    githubRepository = it,
+                    localGitHubRepository = it,
                     onGitHubRepositoryClicked = onGitHubRepositoryClicked
                 )
             }
@@ -302,12 +305,12 @@ fun SearchResultSection(
  */
 @Composable
 fun RepositoryListItem(
-    githubRepository: GitHubRepository,
-    onGitHubRepositoryClicked: (GitHubRepository) -> Unit
+    localGitHubRepository: LocalGitHubRepository,
+    onGitHubRepositoryClicked: (LocalGitHubRepository) -> Unit
 ) {
     Column(
         modifier = Modifier
-            .clickable { onGitHubRepositoryClicked(githubRepository) }
+            .clickable { onGitHubRepositoryClicked(localGitHubRepository) }
             .fillMaxWidth()
             .border(
                 width = dimensionResource(R.dimen.dp_1),
@@ -323,8 +326,9 @@ fun RepositoryListItem(
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.dp_10))
         ) {
-            RepositoryNameSection(githubRepository.name)
-            OwnerSection(githubRepository.owner)
+            ShowSavedIcon(localGitHubRepository.isSaved)
+            RepositoryNameSection(localGitHubRepository.name)
+            OwnerSection(localGitHubRepository.ownerLogin)
             HorizontalDivider(
                 modifier = Modifier.padding(
                     top = dimensionResource(id = R.dimen.dp_8),
@@ -333,11 +337,22 @@ fun RepositoryListItem(
                 thickness = dimensionResource(id = R.dimen.dp_1)
             )
             LanguageAndStatisticsSection(
-                language = githubRepository.language,
-                watchersCount = githubRepository.watchersCount,
-                stargazersCount = githubRepository.stargazersCount
+                language = localGitHubRepository.language,
+                watchersCount = localGitHubRepository.watchersCount,
+                stargazersCount = localGitHubRepository.stargazersCount
             )
         }
+    }
+}
+
+@Composable
+fun ShowSavedIcon(isSaved: Boolean) {
+    if (isSaved) {
+        Icon(
+            imageVector = Icons.Filled.Favorite,
+            contentDescription = null,
+            modifier = Modifier.size(ButtonDefaults.IconSize)
+        )
     }
 }
 
@@ -364,7 +379,7 @@ fun RepositoryNameSection(name: String?) {
  * @param owner The owner of the repository. If null, a default null value is displayed.
  */
 @Composable
-fun OwnerSection(owner: GitHubRepositoryOwner?) {
+fun OwnerSection(ownerLoginName: String?) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -374,7 +389,7 @@ fun OwnerSection(owner: GitHubRepositoryOwner?) {
             color = MaterialTheme.colorScheme.outline
         )
         Text(
-            text = owner?.login ?: stringResource(R.string.null_value),
+            text = ownerLoginName ?: stringResource(R.string.null_value),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.testTag("ResultOwnerName")
         )

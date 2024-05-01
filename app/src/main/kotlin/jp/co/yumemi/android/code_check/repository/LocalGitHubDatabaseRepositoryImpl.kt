@@ -1,6 +1,9 @@
 package jp.co.yumemi.android.code_check.repository
 
+import android.util.Log
 import jp.co.yumemi.android.code_check.constant.ResponseCode.EXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.IOEXCEPTION
+import jp.co.yumemi.android.code_check.constant.ResponseCode.TIMEOUT_EXCEPTION
 import jp.co.yumemi.android.code_check.database.GitHubRepositoryDao
 import jp.co.yumemi.android.code_check.logger.Logger
 import jp.co.yumemi.android.code_check.model.GitHubResponse
@@ -10,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 /**
@@ -44,7 +49,18 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                 try {
                     gitHubRepositoryDao.insertGitHubRepository(localGitHubRepository)
                     emit(GitHubResponse.Success(true))
+                } catch (ex: IOException) {
+                    // Emit a failure result for network errors
+                    emit(GitHubResponse.Error(IOEXCEPTION))
+                    val errorMessage = "Network error occurred: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
+                } catch (ex: SocketTimeoutException) {
+                    // Emit a failure result for connection timeout errors
+                    emit(GitHubResponse.Error(TIMEOUT_EXCEPTION))
+                    val errorMessage = "Connection timed out: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
                 } catch (ex: Exception) {
+                    // Emit a failure result for unexpected errors
                     emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage =
                         "An unexpected error occurred while saving selected github repository: ${ex.message}"
@@ -71,6 +87,16 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                 val response =
                     gitHubRepositoryDao.getSelectedGitHubRepository()
                 emit(GitHubResponse.Success(response))
+            } catch (ex: IOException) {
+                // Emit a failure result for network errors
+                emit(GitHubResponse.Error(IOEXCEPTION))
+                val errorMessage = "Network error occurred: ${ex.message}"
+                logger.error(TAG, errorMessage, ex)
+            } catch (ex: SocketTimeoutException) {
+                // Emit a failure result for connection timeout errors
+                emit(GitHubResponse.Error(TIMEOUT_EXCEPTION))
+                val errorMessage = "Connection timed out: ${ex.message}"
+                logger.error(TAG, errorMessage, ex)
             } catch (ex: Exception) {
                 emit(GitHubResponse.Error(EXCEPTION))
                 val errorMessage =
@@ -81,7 +107,7 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Suspend function that saves selected Github repository in to My saved list.
+     * Suspend function that saves selected Github repository in to user's saved list.
      * This method utilizes Kotlin coroutines and returns a [Flow] of [GitHubResponse] objects.
      *
      * The emitted responses can be of the following types:
@@ -101,6 +127,16 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                 try {
                     gitHubRepositoryDao.insertSavedGitHubRepository(savedGitHubRepository)
                     emit(GitHubResponse.Success(true))
+                } catch (ex: IOException) {
+                    // Emit a failure result for network errors
+                    emit(GitHubResponse.Error(IOEXCEPTION))
+                    val errorMessage = "Network error occurred: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
+                } catch (ex: SocketTimeoutException) {
+                    // Emit a failure result for connection timeout errors
+                    emit(GitHubResponse.Error(TIMEOUT_EXCEPTION))
+                    val errorMessage = "Connection timed out: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
                 } catch (ex: Exception) {
                     emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage =
@@ -112,7 +148,7 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Suspend function that deleted selected Github repository from My saved list in database.
+     * Suspend function that deleted selected Github repository from user's saved list in database.
      * This method utilizes Kotlin coroutines and returns a [Flow] of [GitHubResponse] objects.
      *
      * The emitted responses can be of the following types:
@@ -132,6 +168,16 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                 try {
                     gitHubRepositoryDao.deleteSavedGitHubRepository(savedGitHubRepository)
                     emit(GitHubResponse.Success(true))
+                } catch (ex: IOException) {
+                    // Emit a failure result for network errors
+                    emit(GitHubResponse.Error(IOEXCEPTION))
+                    val errorMessage = "Network error occurred: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
+                } catch (ex: SocketTimeoutException) {
+                    // Emit a failure result for connection timeout errors
+                    emit(GitHubResponse.Error(TIMEOUT_EXCEPTION))
+                    val errorMessage = "Connection timed out: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
                 } catch (ex: Exception) {
                     emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage =
@@ -144,10 +190,10 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
 
     /**
      * Suspend function that fetches a list `SavedGitHubRepository` objects from the database.
-     * This `SavedGitHubRepository` represents a GitHub repository added to My saved list.
+     * This `SavedGitHubRepository` represents a GitHub repository added to user's saved list.
      *
      * @return A `Flow` of `GitHubResponse<List<SavedGitHubRepository>>` object. The emitted responses indicate the outcome:
-     *   - `Success` containing a list of `SavedGitHubRepository` objects representing the My saved list.
+     *   - `Success` containing a list of `SavedGitHubRepository` objects representing the user's saved list.
      *   - `Error` containing an error message if any exception occurred during the retrieval process.
      */
     override suspend fun getMySavedList(): Flow<GitHubResponse<List<SavedGitHubRepository>>> {
@@ -157,10 +203,20 @@ class LocalGitHubDatabaseRepositoryImpl @Inject constructor(
                 try {
                     val response = gitHubRepositoryDao.getSavedGitHubRepositories()
                     emit(GitHubResponse.Success(response))
+                } catch (ex: IOException) {
+                    // Emit a failure result for network errors
+                    emit(GitHubResponse.Error(IOEXCEPTION))
+                    val errorMessage = "Network error occurred: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
+                } catch (ex: SocketTimeoutException) {
+                    // Emit a failure result for connection timeout errors
+                    emit(GitHubResponse.Error(TIMEOUT_EXCEPTION))
+                    val errorMessage = "Connection timed out: ${ex.message}"
+                    logger.error(TAG, errorMessage, ex)
                 } catch (ex: Exception) {
                     emit(GitHubResponse.Error(EXCEPTION))
                     val errorMessage =
-                        "An unexpected error occurred while retrieving My saved list: ${ex.message}"
+                        "An unexpected error occurred while retrieving user's saved list: ${ex.message}"
                     logger.error(TAG, errorMessage, ex)
                 }
             }

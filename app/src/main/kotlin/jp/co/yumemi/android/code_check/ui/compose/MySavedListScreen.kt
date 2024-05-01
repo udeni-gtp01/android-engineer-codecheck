@@ -19,6 +19,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -27,16 +33,73 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
-import jp.co.yumemi.android.code_check.model.GitHubRepository
-import jp.co.yumemi.android.code_check.model.GitHubRepositoryOwner
+import jp.co.yumemi.android.code_check.model.GitHubResponse
+import jp.co.yumemi.android.code_check.model.SavedGitHubRepository
+import jp.co.yumemi.android.code_check.viewModel.MySavedListViewModel
 
 @Composable
 fun MySavedListScreen(
     modifier: Modifier = Modifier,
-
+    mySavedListViewModel: MySavedListViewModel = hiltViewModel(),
+    navigateToGitHubRepositoryInfo: () -> Unit,
 ) {
+    val mySavedListState = mySavedListViewModel.mySavedListState.collectAsState()
+    val isSelectedGitHubRepositorySavedState =
+        mySavedListViewModel.isSelectedGitHubRepositorySavedState.collectAsState()
+    // State variable to hold the navigation condition
+    var shouldNavigateToGitHubRepositoryInfo by remember { mutableStateOf(false) }
 
+    LaunchedEffect(mySavedListState) {
+        mySavedListViewModel.getMySavedList()
+    }
+
+    Column(
+        modifier = modifier
+            .padding(dimensionResource(id = R.dimen.dp_10))
+    ) {
+        when (mySavedListState.value) {
+            is GitHubResponse.Loading -> {
+                LoadingScreen()
+            }
+
+            is GitHubResponse.Error -> {
+                ErrorScreen(
+                    errorTitle = R.string.oh_no,
+                    errorCode = (mySavedListState.value as GitHubResponse.Error).error,
+                    onRetryButtonClicked = { mySavedListViewModel.getMySavedList() }
+                )
+            }
+
+            is GitHubResponse.Success -> {
+                val mySavedListResult = mySavedListState.value as GitHubResponse.Success
+                MySavedListSection(
+                    repositoryList = mySavedListResult.data,
+                    onGitHubRepositoryClicked = { selectedGitHubRepository ->
+                        mySavedListViewModel.saveSelectedGitHubRepositoryInDatabase(
+                            selectedGitHubRepository
+                        )
+                        shouldNavigateToGitHubRepositoryInfo = true
+                    }
+                )
+            }
+        }
+    }
+
+    // Check if navigation is required and perform navigation
+    if (shouldNavigateToGitHubRepositoryInfo) {
+        if (isSelectedGitHubRepositorySavedState.value is GitHubResponse.Success) {
+            navigateToGitHubRepositoryInfo()
+            shouldNavigateToGitHubRepositoryInfo = false // Reset flag after navigation
+        } else if (isSelectedGitHubRepositorySavedState.value is GitHubResponse.Error) {
+            ErrorScreen(
+                errorTitle = R.string.oh_no,
+                errorCode = (mySavedListState.value as GitHubResponse.Error).error,
+                onRetryButtonClicked = { mySavedListViewModel.getMySavedList() }
+            )
+        }
+    }
 }
 
 @Composable
@@ -52,8 +115,8 @@ fun ShowMySavedList() {
  */
 @Composable
 fun MySavedListSection(
-    repositoryList: List<GitHubRepository>,
-    onGitHubRepositoryClicked: (GitHubRepository) -> Unit,
+    repositoryList: List<SavedGitHubRepository>,
+    onGitHubRepositoryClicked: (SavedGitHubRepository) -> Unit,
 ) {
     if (repositoryList.isEmpty()) {
         Column(
@@ -91,8 +154,8 @@ fun MySavedListSection(
  */
 @Composable
 fun MySavedListItem(
-    githubRepository: GitHubRepository,
-    onGitHubRepositoryClicked: (GitHubRepository) -> Unit
+    githubRepository: SavedGitHubRepository,
+    onGitHubRepositoryClicked: (SavedGitHubRepository) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -113,7 +176,7 @@ fun MySavedListItem(
                 .padding(dimensionResource(id = R.dimen.dp_10))
         ) {
             MySavedRepositoryNameSection(githubRepository.name)
-            MySavedRepositoryOwnerSection(githubRepository.owner)
+            MySavedRepositoryOwnerSection(githubRepository.ownerLogin)
             HorizontalDivider(
                 modifier = Modifier.padding(
                     top = dimensionResource(id = R.dimen.dp_8),
@@ -153,7 +216,7 @@ fun MySavedRepositoryNameSection(name: String?) {
  * @param owner The owner of the repository. If null, a default null value is displayed.
  */
 @Composable
-fun MySavedRepositoryOwnerSection(owner: GitHubRepositoryOwner?) {
+fun MySavedRepositoryOwnerSection(ownerLoginName: String?) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -163,7 +226,7 @@ fun MySavedRepositoryOwnerSection(owner: GitHubRepositoryOwner?) {
             color = MaterialTheme.colorScheme.outline
         )
         Text(
-            text = owner?.login ?: stringResource(R.string.null_value),
+            text = ownerLoginName ?: stringResource(R.string.null_value),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.testTag("ResultOwnerName")
         )

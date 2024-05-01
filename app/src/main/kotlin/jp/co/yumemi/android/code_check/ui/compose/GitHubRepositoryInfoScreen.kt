@@ -4,15 +4,28 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -47,6 +60,8 @@ fun GitHubRepositoryInfoScreen(
         it.value?.let { repositoryInfoState ->
             GitHubRepositoryMainInfoSection(
                 repositoryInfoState = repositoryInfoState,
+                onSaveButtonClick = gitHubRepositoryInfoViewModel::addGitHubRepositoryToMySavedList,
+                onUnSaveButtonClick = gitHubRepositoryInfoViewModel::removeGitHubRepositoryFromMySavedList,
                 modifier = modifier
             )
         }
@@ -56,6 +71,8 @@ fun GitHubRepositoryInfoScreen(
 @Composable
 fun GitHubRepositoryMainInfoSection(
     repositoryInfoState: GitHubResponse<LocalGitHubRepository?>,
+    onSaveButtonClick: (localGitHubRepository: LocalGitHubRepository, onSuccess: () -> Unit, onError: (String?) -> Unit, onLoading: () -> Unit) -> Unit,
+    onUnSaveButtonClick: (localGitHubRepository: LocalGitHubRepository, onSuccess: () -> Unit, onError: (String?) -> Unit, onLoading: () -> Unit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (repositoryInfoState is GitHubResponse.Success) {
@@ -65,12 +82,92 @@ fun GitHubRepositoryMainInfoSection(
                 modifier = modifier.padding(horizontal = dimensionResource(id = R.dimen.dp_10))
             ) {
                 item {
-                    ImageSection(ownerAvatarUrl = repositoryInfoState.data.ownerAvatarUrl)
+                    SaveToMySavedListSection(
+                        repository = it,
+                        onSaveButtonClick = onSaveButtonClick,
+                        onUnSaveButtonClick = onUnSaveButtonClick
+                    )
+                }
+                item {
+                    ImageSection(ownerAvatarUrl = it.ownerAvatarUrl)
                 }
                 item {
                     InfoSection(repository = it)
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SaveToMySavedListSection(
+    repository: LocalGitHubRepository,
+    onSaveButtonClick: (localGitHubRepository: LocalGitHubRepository, onSuccess: () -> Unit, onError: (String?) -> Unit, onLoading: () -> Unit) -> Unit,
+    onUnSaveButtonClick: (localGitHubRepository: LocalGitHubRepository, onSuccess: () -> Unit, onError: (String?) -> Unit, onLoading: () -> Unit) -> Unit,
+) {
+    Surface(
+
+    ) {
+        var isSaved by remember { mutableStateOf(false) }
+        isSaved = repository.isSaved
+
+        // Track save operation loading state
+        var isSaveResponseLoading by remember { mutableStateOf(false) }
+        ElevatedButton(
+            onClick = {
+                // Only allow saving operation when not loading
+                if (!isSaveResponseLoading) {
+                    isSaved = !isSaved
+                    if (isSaved) {
+                        // Call to add GitHub repository to user's saved list
+                        onSaveButtonClick(
+                            repository,
+                            {
+                                // Reset loading state on success
+                                isSaveResponseLoading = false
+                            },
+                            {
+                                // Reset loading state on error
+                                isSaveResponseLoading = false
+
+                                // Revert the saved status on error
+                                isSaved = !isSaved
+                            },
+                            {
+                                // Set loading state on loading
+                                isSaveResponseLoading = true
+                            }
+                        )
+                    } else {
+                        // Call to remove GitHub repository from user's saved list
+                        onUnSaveButtonClick(
+                            repository,
+                            {
+                                // Reset loading state on success
+                                isSaveResponseLoading = false
+                            },
+                            {
+                                // Reset loading state on error
+                                isSaveResponseLoading = false
+
+                                // Revert the saved status on error
+                                isSaved = !isSaved
+                            },
+                            {
+                                // Set loading state on loading
+                                isSaveResponseLoading = true
+                            }
+                        )
+                    }
+                }
+            }) {
+            Icon(
+                imageVector = if (isSaved) Icons.Default.FavoriteBorder else Icons.Filled.Favorite,
+                contentDescription = if (isSaved) "Save me" else "Unsave me",
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+            Text(text = if (isSaved) "Unsave me" else "Save me")
         }
     }
 }

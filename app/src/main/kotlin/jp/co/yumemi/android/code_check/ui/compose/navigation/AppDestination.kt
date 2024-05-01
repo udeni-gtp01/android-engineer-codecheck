@@ -32,11 +32,11 @@ object GitHubRepositoryInfoDestination : AppDestination {
 }
 
 /**
- * An object representing the My saved list destination.
+ * An object representing the user's saved list destination.
  */
 object MySavedListDestination : AppDestination {
     /**
-     * The route to the My saved list screen.
+     * The route to the user's saved list screen.
      */
     override val route = DESTINATION_MY_SAVED_LIST
 }

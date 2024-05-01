@@ -44,7 +44,7 @@ interface LocalGitHubDatabaseRepository {
     fun getSelectedGitHubRepositoryFromDatabase(): Flow<GitHubResponse<LocalGitHubRepository?>>
 
     /**
-     * Suspend function that saves selected Github repository in to My saved list.
+     * Suspend function that saves selected Github repository in to user's saved list.
      * This method utilizes Kotlin coroutines and returns a [Flow] of [GitHubResponse] objects.
      *
      * The emitted responses can be of the following types:
@@ -60,7 +60,7 @@ interface LocalGitHubDatabaseRepository {
     suspend fun addGitHubRepositoryToMySavedList(savedGitHubRepository: SavedGitHubRepository): Flow<GitHubResponse<Boolean>>
 
     /**
-     * Suspend function that deleted selected Github repository from My saved list in database.
+     * Suspend function that deleted selected Github repository from user's saved list in database.
      * This method utilizes Kotlin coroutines and returns a [Flow] of [GitHubResponse] objects.
      *
      * The emitted responses can be of the following types:
@@ -77,10 +77,10 @@ interface LocalGitHubDatabaseRepository {
 
     /**
      * Suspend function that fetches a list `SavedGitHubRepository` objects from the database.
-     * This `SavedGitHubRepository` represents a GitHub repository added to My saved list.
+     * This `SavedGitHubRepository` represents a GitHub repository added to user's saved list.
      *
      * @return A `Flow` of `GitHubResponse<List<SavedGitHubRepository>>` object. The emitted responses indicate the outcome:
-     *   - `Success` containing a list of `SavedGitHubRepository` objects representing the My saved list.
+     *   - `Success` containing a list of `SavedGitHubRepository` objects representing the user's saved list.
      *   - `Error` containing an error message if any exception occurred during the retrieval process.
      */
     suspend fun getMySavedList(): Flow<GitHubResponse<List<SavedGitHubRepository>>>

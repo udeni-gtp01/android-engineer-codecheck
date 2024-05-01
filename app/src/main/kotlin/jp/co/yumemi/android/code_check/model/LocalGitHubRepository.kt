@@ -12,6 +12,7 @@ import jp.co.yumemi.android.code_check.constant.DatabaseConstant.ROOM_GITHUB_REP
  *  @param oneId [PrimaryKey]: This field serves as the primary key for the Room table.
  *      - Setting a fixed value (`1`) ensures a single row exists in the table. This approach is
  *        used to store GitHub repository selected by user to see more info from search results list.
+ *  @param id: Id of the GitHub Repository.
  *  @param forksCount: The number of forks associated with the GitHub repository (nullable).
  *  @param language: The programming language the GitHub repository is written in (nullable).
  *  @param name: The name of the GitHub repository (nullable).
@@ -21,7 +22,7 @@ import jp.co.yumemi.android.code_check.constant.DatabaseConstant.ROOM_GITHUB_REP
  *  @param htmlUrl: The URL to the GitHub repository's HTML page on GitHub (nullable).
  *  @param ownerLogin: The username of the GitHub repository owner (nullable).
  *  @param ownerAvatarUrl: The URL to the owner's avatar image (nullable).
- *  @param isFavorite: An additional field to track whether the user has favorite the GitHub repository). Defaults to `false`.
+ *  @param isSaved: To track whether the user has added the GitHub repository to user's saved list.
  *
  *  `@Entity(tableName = ROOM_GITHUB_REPO_TABLE_NAME)`: This annotation marks this class as a Room entity,
  *   mapping it to a table named "github_repo_table" within the Room database.
@@ -29,6 +30,7 @@ import jp.co.yumemi.android.code_check.constant.DatabaseConstant.ROOM_GITHUB_REP
 @Entity(tableName = ROOM_GITHUB_REPO_TABLE_NAME)
 data class LocalGitHubRepository(
     @PrimaryKey val oneId: Byte = 1,
+    val id: Long,
     val forksCount: Long?,
     val language: String?,
     val name: String?,
@@ -38,5 +40,27 @@ data class LocalGitHubRepository(
     val htmlUrl: String?,
     val ownerLogin: String?,
     val ownerAvatarUrl: String?,
-    val isFavorite: Boolean = false
+    val isSaved: Boolean
 )
+
+/**
+ * Converts a [GitHubRepository] object to a corresponding [SavedGitHubRepository] object.
+ *
+ * @param isSaved Boolean indicating whether the repository is saved in the user's saved list in local database.
+ * @return A [SavedGitHubRepository] object with properties copied from the [LocalGitHubRepository] object.
+ */
+fun LocalGitHubRepository.toSavedGitHubRepository(isSaved: Boolean): SavedGitHubRepository {
+    return SavedGitHubRepository(
+        id = this.id,
+        forksCount = this.forksCount,
+        language = this.language,
+        name = this.name,
+        openIssuesCount = this.openIssuesCount,
+        stargazersCount = this.stargazersCount,
+        watchersCount = this.watchersCount,
+        htmlUrl = this.htmlUrl,
+        ownerLogin = this.ownerLogin,
+        ownerAvatarUrl = this.ownerAvatarUrl,
+        isSaved = isSaved
+    )
+}
