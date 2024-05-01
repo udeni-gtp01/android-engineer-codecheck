@@ -39,11 +39,7 @@ class HomeViewModel @Inject constructor(
     // StateFlow for holding the outcome of GitHub repository searches.
     // It emits [GitHubResponse] objects representing success, error, or loading state.
     private val _gitHubSearchResultState = MutableStateFlow<GitHubResponse<GitHubRepositoryList>>(
-        GitHubResponse.Success(
-            GitHubRepositoryList(
-                emptyList()
-            )
-        )
+        GitHubResponse.Success(GitHubRepositoryList(emptyList()))
     )
     val gitHubSearchResultState: StateFlow<GitHubResponse<GitHubRepositoryList>> =
         _gitHubSearchResultState
