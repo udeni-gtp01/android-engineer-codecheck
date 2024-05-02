@@ -77,26 +77,37 @@ class HomeViewModel @Inject constructor(
                     gitHubApiRepository.searchGitHubRepositories(searchKeyword)
                         .flowOn(Dispatchers.IO)
                         .collect { gitHubResponse ->
-                            if (gitHubResponse is GitHubResponse.Success) {
-                                val searchedRepos = gitHubResponse.data.items
-                                // Fetch the user's saved GitHub repositories from the local database
-                                localGitHubDatabaseRepository.getMySavedList()
-                                    .flowOn(Dispatchers.IO)
-                                    .collect { databaseResponse ->
-                                        if (databaseResponse is GitHubResponse.Success) {
-                                            val savedRepos = databaseResponse.data
-                                            // Map each searched GitHub repository to update the isSaved property
-                                            val updatedRepos = searchedRepos.map { searchedRepo ->
-                                                val isSaved =
-                                                    savedRepos.any { savedRepo -> savedRepo.id == searchedRepo.id }
-                                                // Create a copy of the GitHub searched repository with the updated isSaved property
-                                                searchedRepo.toLocalGitHubRepository(isSaved = isSaved)
+                            when (gitHubResponse) {
+                                is GitHubResponse.Loading -> {
+                                    _gitHubSearchResultState.value = gitHubResponse
+                                }
+
+                                is GitHubResponse.Success -> {
+                                    val searchedRepos = gitHubResponse.data.items
+                                    // Fetch the user's saved GitHub repositories from the local database
+                                    localGitHubDatabaseRepository.getMySavedList()
+                                        .flowOn(Dispatchers.IO)
+                                        .collect { databaseResponse ->
+                                            if (databaseResponse is GitHubResponse.Success) {
+                                                val savedRepos = databaseResponse.data
+                                                // Map each searched GitHub repository to update the isSaved property
+                                                val updatedRepos =
+                                                    searchedRepos.map { searchedRepo ->
+                                                        val isSaved =
+                                                            savedRepos.any { savedRepo -> savedRepo.id == searchedRepo.id }
+                                                        // Create a copy of the GitHub searched repository with the updated isSaved property
+                                                        searchedRepo.toLocalGitHubRepository(isSaved = isSaved)
+                                                    }
+                                                // Update the state with the updated list of repositories
+                                                _gitHubSearchResultState.value =
+                                                    GitHubResponse.Success(updatedRepos)
                                             }
-                                            // Update the state with the updated list of repositories
-                                            _gitHubSearchResultState.value =
-                                                GitHubResponse.Success(updatedRepos)
                                         }
-                                    }
+                                }
+
+                                is GitHubResponse.Error -> {
+                                    _gitHubSearchResultState.value = gitHubResponse
+                                }
                             }
                         }
                 } catch (ex: Exception) {
@@ -175,17 +186,27 @@ class HomeViewModel @Inject constructor(
                         localGitHubDatabaseRepository.getMySavedList()
                             .flowOn(Dispatchers.IO)
                             .collect { databaseResponse ->
-                                if (databaseResponse is GitHubResponse.Success) {
-                                    val savedRepos = databaseResponse.data
-                                    // Map each searched GitHub repository to update the isSaved property
-                                    val updatedRepos = searchedRepos.map { searchedRepo ->
-                                        val isSaved =
-                                            savedRepos.any { savedRepo -> savedRepo.id == searchedRepo.id }
-                                        searchedRepo.copy(isSaved = isSaved)
+                                when (databaseResponse) {
+                                    is GitHubResponse.Loading -> {
+                                        _gitHubSearchResultState.value = databaseResponse
                                     }
-                                    // Update the state with the updated list of GitHub repositories
-                                    _gitHubSearchResultState.value =
-                                        GitHubResponse.Success(updatedRepos)
+
+                                    is GitHubResponse.Success -> {
+                                        val savedRepos = databaseResponse.data
+                                        // Map each searched GitHub repository to update the isSaved property
+                                        val updatedRepos = searchedRepos.map { searchedRepo ->
+                                            val isSaved =
+                                                savedRepos.any { savedRepo -> savedRepo.id == searchedRepo.id }
+                                            searchedRepo.copy(isSaved = isSaved)
+                                        }
+                                        // Update the state with the updated list of GitHub repositories
+                                        _gitHubSearchResultState.value =
+                                            GitHubResponse.Success(updatedRepos)
+                                    }
+
+                                    is GitHubResponse.Error -> {
+                                        _gitHubSearchResultState.value = databaseResponse
+                                    }
                                 }
                             }
                     }
