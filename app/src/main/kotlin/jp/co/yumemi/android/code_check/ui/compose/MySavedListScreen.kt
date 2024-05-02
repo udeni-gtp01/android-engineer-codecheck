@@ -1,22 +1,22 @@
 package jp.co.yumemi.android.code_check.ui.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,56 +33,80 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.GitHubResponse
 import jp.co.yumemi.android.code_check.model.SavedGitHubRepository
+import jp.co.yumemi.android.code_check.ui.theme.GithubRepositoryAppTheme
 import jp.co.yumemi.android.code_check.viewModel.MySavedListViewModel
 
+/**
+ * Composable function for displaying the screen of user's saved GitHub repositories.
+ *
+ * @param modifier Modifier for styling and layout customization.
+ * @param mySavedListViewModel ViewModel for managing the state and logic of the saved repository screen.
+ * @param navigateToGitHubRepositoryInfo Callback function for navigating to detailed repository information.
+ */
 @Composable
 fun MySavedListScreen(
     modifier: Modifier = Modifier,
     mySavedListViewModel: MySavedListViewModel = hiltViewModel(),
     navigateToGitHubRepositoryInfo: () -> Unit,
 ) {
+    // Collecting the state of the user's saved GitHub repository list
     val mySavedListState = mySavedListViewModel.mySavedListState.collectAsState()
+
+    // Collecting the state of the selected GitHub repository
     val isSelectedGitHubRepositorySavedState =
         mySavedListViewModel.isSelectedGitHubRepositorySavedState.collectAsState()
+
     // State variable to hold the navigation condition
     var shouldNavigateToGitHubRepositoryInfo by remember { mutableStateOf(false) }
 
+    // Fetching the user's saved GitHub repository list when the composable is launched
     LaunchedEffect(mySavedListState) {
         mySavedListViewModel.getMySavedList()
     }
+    Scaffold(
+        topBar = {
+            GithubRepoAppTopAppBar(
+                title = R.string.saved_screen_title,
+                description = R.string.saved_screen_description,
+                modifier = modifier,
+                isFilled = false
+            )
+        },
+    ) { padding ->
+        Column(
+            modifier = modifier.padding(padding)
+        ) {
+            // Handling different states of the user's saved GitHub repository list
+            when (mySavedListState.value) {
+                is GitHubResponse.Loading -> {
+                    LoadingScreen()
+                }
 
-    Column(
-        modifier = modifier
-            .padding(dimensionResource(id = R.dimen.dp_10))
-    ) {
-        when (mySavedListState.value) {
-            is GitHubResponse.Loading -> {
-                LoadingScreen()
-            }
+                is GitHubResponse.Error -> {
+                    ErrorScreen(
+                        errorTitle = R.string.oh_no,
+                        errorCode = (mySavedListState.value as GitHubResponse.Error).error,
+                        onRetryButtonClicked = { mySavedListViewModel.getMySavedList() }
+                    )
+                }
 
-            is GitHubResponse.Error -> {
-                ErrorScreen(
-                    errorTitle = R.string.oh_no,
-                    errorCode = (mySavedListState.value as GitHubResponse.Error).error,
-                    onRetryButtonClicked = { mySavedListViewModel.getMySavedList() }
-                )
-            }
-
-            is GitHubResponse.Success -> {
-                val mySavedListResult = mySavedListState.value as GitHubResponse.Success
-                MySavedListSection(
-                    repositoryList = mySavedListResult.data,
-                    onGitHubRepositoryClicked = { selectedGitHubRepository ->
-                        mySavedListViewModel.saveSelectedGitHubRepositoryInDatabase(
-                            selectedGitHubRepository
-                        )
-                        shouldNavigateToGitHubRepositoryInfo = true
-                    }
-                )
+                is GitHubResponse.Success -> {
+                    val mySavedListResult = mySavedListState.value as GitHubResponse.Success
+                    MySavedListSection(
+                        repositoryList = mySavedListResult.data,
+                        onGitHubRepositoryClicked = { selectedGitHubRepository ->
+                            mySavedListViewModel.saveSelectedGitHubRepositoryInDatabase(
+                                selectedGitHubRepository
+                            )
+                            shouldNavigateToGitHubRepositoryInfo = true
+                        }
+                    )
+                }
             }
         }
     }
@@ -102,16 +126,11 @@ fun MySavedListScreen(
     }
 }
 
-@Composable
-fun ShowMySavedList() {
-
-}
-
 /**
- * Composable function for displaying the repository list search result.
+ * Composable function for displaying the section of the user's saved GitHub repository list.
  *
- * @param repositoryList List of repository items.
- * @param onGitHubRepositoryClicked Callback function when a single repository list item is clicked.
+ * @param repositoryList List of saved GitHub repository items.
+ * @param onGitHubRepositoryClicked Callback function when a saved repository item is clicked.
  */
 @Composable
 fun MySavedListSection(
@@ -119,6 +138,7 @@ fun MySavedListSection(
     onGitHubRepositoryClicked: (SavedGitHubRepository) -> Unit,
 ) {
     if (repositoryList.isEmpty()) {
+        // Displaying a message if the saved repository list is empty
         Column(
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.dp_10))
@@ -126,14 +146,17 @@ fun MySavedListSection(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = stringResource(id = R.string.no_result))
+            Text(text = stringResource(id = R.string.empty_saved_list))
         }
     } else {
+        // Displaying the saved GitHub repository list
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp_12)),
             contentPadding = PaddingValues(
                 top = dimensionResource(id = R.dimen.dp_12),
-                bottom = dimensionResource(id = R.dimen.dp_12)
+                bottom = dimensionResource(id = R.dimen.dp_12),
+                start = dimensionResource(id = R.dimen.dp_10),
+                end = dimensionResource(id = R.dimen.dp_10)
             )
         ) {
             items(items = repositoryList) {
@@ -147,9 +170,9 @@ fun MySavedListSection(
 }
 
 /**
- * Composable function for displaying a single repository item.
+ * Composable function for displaying a single item of the user's saved GitHub repository list.
  *
- * @param githubRepository The repository item to display.
+ * @param githubRepository The saved repository item to display.
  * @param onGitHubRepositoryClicked Callback function when this item is clicked.
  */
 @Composable
@@ -157,33 +180,19 @@ fun MySavedListItem(
     githubRepository: SavedGitHubRepository,
     onGitHubRepositoryClicked: (SavedGitHubRepository) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .clickable { onGitHubRepositoryClicked(githubRepository) }
-            .fillMaxWidth()
-            .border(
-                width = dimensionResource(R.dimen.dp_1),
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(dimensionResource(R.dimen.dp_5))
-            )
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(dimensionResource(R.dimen.dp_5))
-            )
+    OutlinedCard(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = Modifier.clickable { onGitHubRepositoryClicked(githubRepository) }
     ) {
         Column(
-            modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.dp_10))
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.dp_10))
         ) {
+            // Section for displaying the GitHub repository name
             MySavedRepositoryNameSection(githubRepository.name)
+            // Section for displaying the owner of the repository
             MySavedRepositoryOwnerSection(githubRepository.ownerLogin)
-            HorizontalDivider(
-                modifier = Modifier.padding(
-                    top = dimensionResource(id = R.dimen.dp_8),
-                    bottom = dimensionResource(id = R.dimen.dp_8)
-                ),
-                thickness = dimensionResource(id = R.dimen.dp_1)
-            )
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.dp_10)))
+            // Section for displaying language and statistics of the repository
             MySavedRepositoryLanguageAndStatisticsSection(
                 language = githubRepository.language,
                 watchersCount = githubRepository.watchersCount,
@@ -194,9 +203,9 @@ fun MySavedListItem(
 }
 
 /**
- * Composable function for displaying the repository name.
+ * Composable function for displaying the section of the GitHub repository name.
  *
- * @param name The name of the repository. If null, nothing is displayed.
+ * @param name The name of the saved GitHub repository. If null, nothing is displayed.
  */
 @Composable
 fun MySavedRepositoryNameSection(name: String?) {
@@ -211,9 +220,9 @@ fun MySavedRepositoryNameSection(name: String?) {
 }
 
 /**
- * Composable function for displaying the owner section.
+ * Composable function for displaying the section of the GitHub repository owner.
  *
- * @param owner The owner of the repository. If null, a default null value is displayed.
+ * @param ownerLoginName The login name of the owner of the saved GitHub repository.
  */
 @Composable
 fun MySavedRepositoryOwnerSection(ownerLoginName: String?) {
@@ -223,7 +232,6 @@ fun MySavedRepositoryOwnerSection(ownerLoginName: String?) {
         Text(
             text = stringResource(R.string.by),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
         )
         Text(
             text = ownerLoginName ?: stringResource(R.string.null_value),
@@ -234,11 +242,11 @@ fun MySavedRepositoryOwnerSection(ownerLoginName: String?) {
 }
 
 /**
- * Composable function for displaying language and statistics section.
+ * Composable function for displaying the section of language and statistics of the GitHub repository.
  *
- * @param language The programming language used in the repository. If null, a default null value is displayed.
- * @param watchersCount The number of watchers for the repository. If null, a default null value is displayed.
- * @param stargazersCount The number of stargazers for the repository. If null, a default null value is displayed.
+ * @param language The programming language used in the saved GitHub repository.
+ * @param watchersCount The number of watchers for the saved GitHub repository.
+ * @param stargazersCount The number of stargazers for the saved GitHub repository.
  */
 @Composable
 fun MySavedRepositoryLanguageAndStatisticsSection(
@@ -251,7 +259,7 @@ fun MySavedRepositoryLanguageAndStatisticsSection(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Section for the language used in the repository
+        // Section for displaying the programming language
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -259,7 +267,6 @@ fun MySavedRepositoryLanguageAndStatisticsSection(
             Icon(
                 painter = languagePainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
             )
             Text(
@@ -280,13 +287,12 @@ fun MySavedRepositoryLanguageAndStatisticsSection(
             Icon(
                 painter = watcherPainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
             )
             Text(
                 text = String.format(
                     stringResource(R.string.watchers_summary),
-                    watchersCount ?: stringResource(R.string.null_value),
+                    watchersCount ?: stringResource(R.string.null_value)
                 ),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.testTag("ResultWatchers")
@@ -301,7 +307,6 @@ fun MySavedRepositoryLanguageAndStatisticsSection(
             Icon(
                 painter = starPainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
             )
             Text(
@@ -312,6 +317,32 @@ fun MySavedRepositoryLanguageAndStatisticsSection(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.testTag("ResultStargazers")
             )
+        }
+    }
+}
+
+/**
+ * Preview function for the MySavedListItem composable, used for Compose UI preview.
+ * This is useful during the development process.
+ */
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewMySavedListItem() {
+    val testGitHubRepository = SavedGitHubRepository(
+        id = 123,
+        forksCount = 50,
+        language = "Kotlin",
+        name = "My Awesome Project",
+        openIssuesCount = 2,
+        stargazersCount = 100,
+        watchersCount = 75,
+        htmlUrl = "https://github.com/user/my-awesome-project",
+        ownerLogin = "user",
+        ownerAvatarUrl = "https://avatars.githubusercontent.com/user",
+        isSaved = true
+    )
+    GithubRepositoryAppTheme {
+        MySavedListItem(githubRepository = testGitHubRepository) {
         }
     }
 }

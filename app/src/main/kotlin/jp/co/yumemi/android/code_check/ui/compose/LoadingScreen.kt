@@ -68,7 +68,8 @@ fun LoadingAnimation(
                 durationMillis = animationDuration,
                 easing = LinearEasing
             )
-        ), label = stringResource(id = R.string.loading)
+        ),
+        label = stringResource(id = R.string.loading)
     )
 
     CircularProgressIndicator(

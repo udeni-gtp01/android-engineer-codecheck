@@ -15,7 +15,7 @@
     <string name="by">"by "</string>
     <string name="null_value">"-"</string>
     <string name="retry">Retry</string>
-    <string name="no_result">No Results</string>
+    <string name="no_result">Search results were not found</string>
     <string name="oh_no">Oh no!</string>
     <string name="no_internet">No Internet found. Please check your connection or try again.</string>
     <string name="invalid_request">Error occurred. Please check entered repository name and try again.</string>
@@ -24,4 +24,13 @@
     <string name="timeout_error">Error occurred. Looks like it is taking longer than usual. Please check your connection and try again.</string>
     <string name="loading">Loading</string>
     <string name="go_to_repository">Go to Repository</string>
+    <string name="saved_screen_title">My saved list</string>
+    <string name="saved_screen_description">See what I have saved</string>
+    <string name="home_screen_description">Search GitHub repositories</string>
+    <string name="info_screen_title">Information</string>
+    <string name="info_screen_description">See more about repository</string>
+    <string name="unsave">Remove from Saved</string>
+    <string name="save">Save</string>
+    <string name="saved">Saved</string>
+    <string name="empty_saved_list">Saved list is empty</string>
 </resources>

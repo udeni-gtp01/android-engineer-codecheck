@@ -1,34 +1,29 @@
 package jp.co.yumemi.android.code_check.ui.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,7 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
@@ -50,7 +44,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.model.GitHubResponse
@@ -58,10 +51,12 @@ import jp.co.yumemi.android.code_check.model.LocalGitHubRepository
 import jp.co.yumemi.android.code_check.viewModel.HomeViewModel
 
 /**
- * Composable function representing the main screen of the app.
+ * Composable function for the home screen of the application.
  *
- * @param navigateToGitHubRepositoryInfo Callback function when a repository item is clicked.
- * @param modifier Modifier for customizing the layout.
+ * @param modifier Modifier for styling and layout customization.
+ * @param homeViewModel ViewModel for managing the state and logic of the home screen.
+ * @param navigateToGitHubRepositoryInfo Callback function for navigating to detailed GitHub repository information.
+ * @param onMySavedListButtonClick Callback function for the click event of the "Saved" FAB.
  */
 @Composable
 fun HomeScreen(
@@ -70,28 +65,37 @@ fun HomeScreen(
     navigateToGitHubRepositoryInfo: () -> Unit,
     onMySavedListButtonClick: () -> Unit
 ) {
+    // Collecting the state of the GitHub search result
     val gitHubSearchResultState = homeViewModel.gitHubSearchResultState.collectAsState()
+
+    // Collecting the state of the selected GitHub repository
     val isSelectedGitHubRepositorySavedState =
         homeViewModel.isSelectedGitHubRepositorySavedState.collectAsState()
+
+    // Accessing the keyboard controller
     val keyboardController = LocalSoftwareKeyboardController.current
 
     // State variable to hold the navigation condition
     var shouldNavigateToGitHubRepositoryInfo by remember { mutableStateOf(false) }
+
+    // Fetching recent updates from the database when the composable is launched
     LaunchedEffect(gitHubSearchResultState) {
         homeViewModel.getRecentUpdateFromDatabase()
     }
     Scaffold(
         topBar = {
-            GithubRepoAppTopAppBar()
+            GithubRepoAppTopAppBar(
+                title = R.string.app_name,
+                description = R.string.home_screen_description,
+                modifier = modifier
+            )
         },
-        floatingActionButton = {
-            MySavedListButton(onMySavedListButtonClick)
-        }
+        floatingActionButton = { MySavedListButton(onMySavedListButtonClick) }
     ) { padding ->
         Column(
-            modifier = modifier
-                .padding(padding)
+            modifier = modifier.padding(padding)
         ) {
+            // Section for the search field
             SearchSection(
                 searchKeyword = homeViewModel.searchKeyword,
                 onSearchKeywordChange = { homeViewModel.updateSearchKeyword(it) },
@@ -102,6 +106,7 @@ fun HomeScreen(
                 onClearButtonClicked = { homeViewModel.clearSearchKeyword() },
             )
 
+            // Handling different states of the GitHub search result
             when (gitHubSearchResultState.value) {
                 is GitHubResponse.Loading -> {
                     LoadingScreen()
@@ -117,6 +122,7 @@ fun HomeScreen(
 
                 is GitHubResponse.Success -> {
                     val gitHubSearchResult = gitHubSearchResultState.value as GitHubResponse.Success
+                    // Section for displaying the search result
                     SearchResultSection(
                         repositoryList = gitHubSearchResult.data,
                         onGitHubRepositoryClicked = { selectedGitHubRepository ->
@@ -146,33 +152,30 @@ fun HomeScreen(
     }
 }
 
+/**
+ * Composable function for the "Saved" FAB.
+ *
+ * @param onMySavedListButtonClick Callback function for the click event of the button.
+ */
 @Composable
 fun MySavedListButton(onMySavedListButtonClick: () -> Unit) {
-    FloatingActionButton(
-        shape = MaterialTheme.shapes.large.copy(CornerSize(percent = 50)),
+    ExtendedFloatingActionButton(
         onClick = onMySavedListButtonClick,
-        contentColor = MaterialTheme.colorScheme.primary,
-        containerColor = Color.Transparent,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(56.dp, 56.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.tertiary
-                ),
-            contentAlignment = Alignment.Center
-        ) {
+        icon = {
             Icon(
-                Icons.Default.Star,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onTertiary
+                painter = painterResource(id = R.drawable.baseline_collections_bookmark_24),
+                contentDescription = stringResource(id = R.string.saved),
+                modifier = Modifier.size(ButtonDefaults.IconSize),
             )
-        }
-    }
+        },
+        text = { Text(text = stringResource(id = R.string.saved)) },
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
+    )
 }
 
 /**
- * Composable function for the search field section of the main screen.
+ * Composable function for the search field section of the home screen.
  *
  * @param searchKeyword The search keyword.
  * @param onSearchKeywordChange Callback function for changes in the search keyword.
@@ -192,6 +195,7 @@ fun SearchSection(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.padding(dimensionResource(id = R.dimen.dp_10))
     ) {
+        // Text field for entering the search keyword
         OutlinedTextField(
             value = searchKeyword,
             singleLine = true,
@@ -259,9 +263,9 @@ fun ClearButton(onClearButtonClicked: () -> Unit) {
 }
 
 /**
- * Composable function for displaying the repository list search result.
+ * Composable function for displaying the GitHub repository list search result.
  *
- * @param repositoryList List of repository items.
+ * @param repositoryList List of GitHub repository items.
  * @param onGitHubRepositoryClicked Callback function when a single repository list item is clicked.
  */
 @Composable
@@ -270,6 +274,7 @@ fun SearchResultSection(
     onGitHubRepositoryClicked: (LocalGitHubRepository) -> Unit,
 ) {
     if (repositoryList.isEmpty()) {
+        // Displaying a message when no results are found
         Column(
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.dp_10))
@@ -280,14 +285,18 @@ fun SearchResultSection(
             Text(text = stringResource(id = R.string.no_result))
         }
     } else {
+        // Lazy column for displaying the list of searched GitHub repositories
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dp_12)),
             contentPadding = PaddingValues(
                 top = dimensionResource(id = R.dimen.dp_12),
-                bottom = dimensionResource(id = R.dimen.dp_12)
+                bottom = dimensionResource(id = R.dimen.dp_12),
+                start = dimensionResource(id = R.dimen.dp_10),
+                end = dimensionResource(id = R.dimen.dp_10)
             )
         ) {
             items(items = repositoryList) {
+                // Displaying each repository item as a list item
                 RepositoryListItem(
                     localGitHubRepository = it,
                     onGitHubRepositoryClicked = onGitHubRepositoryClicked
@@ -298,9 +307,9 @@ fun SearchResultSection(
 }
 
 /**
- * Composable function for displaying a single repository item.
+ * Composable function for displaying a single GitHub repository item.
  *
- * @param githubRepository The repository item to display.
+ * @param localGitHubRepository The repository item to display.
  * @param onGitHubRepositoryClicked Callback function when this item is clicked.
  */
 @Composable
@@ -308,34 +317,24 @@ fun RepositoryListItem(
     localGitHubRepository: LocalGitHubRepository,
     onGitHubRepositoryClicked: (LocalGitHubRepository) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .clickable { onGitHubRepositoryClicked(localGitHubRepository) }
-            .fillMaxWidth()
-            .border(
-                width = dimensionResource(R.dimen.dp_1),
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(dimensionResource(R.dimen.dp_5))
-            )
-            .background(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(dimensionResource(R.dimen.dp_5))
-            )
+    OutlinedCard(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        ),
+        modifier = Modifier.clickable { onGitHubRepositoryClicked(localGitHubRepository) }
     ) {
         Column(
             modifier = Modifier
                 .padding(dimensionResource(id = R.dimen.dp_10))
         ) {
+            // Displaying bookmark icon if the GitHub repository is saved
             ShowSavedIcon(localGitHubRepository.isSaved)
+            // Section for repository name
             RepositoryNameSection(localGitHubRepository.name)
+            // Section for owner
             OwnerSection(localGitHubRepository.ownerLogin)
-            HorizontalDivider(
-                modifier = Modifier.padding(
-                    top = dimensionResource(id = R.dimen.dp_8),
-                    bottom = dimensionResource(id = R.dimen.dp_8)
-                ),
-                thickness = dimensionResource(id = R.dimen.dp_1)
-            )
+            Spacer(modifier = Modifier.size(dimensionResource(id = R.dimen.dp_10)))
+            // Section for language and statistic
             LanguageAndStatisticsSection(
                 language = localGitHubRepository.language,
                 watchersCount = localGitHubRepository.watchersCount,
@@ -345,19 +344,31 @@ fun RepositoryListItem(
     }
 }
 
+/**
+ * Composable function for displaying the bookmark icon for a GitHub repository.
+ *
+ * @param isSaved Boolean indicating whether the repository is saved.
+ */
 @Composable
 fun ShowSavedIcon(isSaved: Boolean) {
+    // Displaying the bookmark icon if the repository is saved
     if (isSaved) {
-        Icon(
-            imageVector = Icons.Filled.Favorite,
-            contentDescription = null,
-            modifier = Modifier.size(ButtonDefaults.IconSize)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.baseline_bookmark_24),
+                contentDescription = stringResource(id = R.string.saved),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+        }
     }
 }
 
 /**
- * Composable function for displaying the repository name.
+ * Composable function for displaying the GitHub repository name.
  *
  * @param name The name of the repository. If null, nothing is displayed.
  */
@@ -376,7 +387,7 @@ fun RepositoryNameSection(name: String?) {
 /**
  * Composable function for displaying the owner section.
  *
- * @param owner The owner of the repository. If null, a default null value is displayed.
+ * @param ownerLoginName The owner's login name of the repository. If null, a default null value is displayed.
  */
 @Composable
 fun OwnerSection(ownerLoginName: String?) {
@@ -386,7 +397,6 @@ fun OwnerSection(ownerLoginName: String?) {
         Text(
             text = stringResource(R.string.by),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
         )
         Text(
             text = ownerLoginName ?: stringResource(R.string.null_value),
@@ -414,15 +424,12 @@ fun LanguageAndStatisticsSection(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Section for the language used in the repository
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        // Section for displaying the programming language
+        Row(verticalAlignment = Alignment.CenterVertically) {
             val languagePainter: Painter = painterResource(id = R.drawable.outline_code)
             Icon(
                 painter = languagePainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
             )
             Text(
@@ -443,7 +450,6 @@ fun LanguageAndStatisticsSection(
             Icon(
                 painter = watcherPainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
             )
             Text(
@@ -464,7 +470,6 @@ fun LanguageAndStatisticsSection(
             Icon(
                 painter = starPainter,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(dimensionResource(id = R.dimen.sp_18))
             )
             Text(

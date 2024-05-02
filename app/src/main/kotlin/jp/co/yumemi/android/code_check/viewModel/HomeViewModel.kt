@@ -123,9 +123,11 @@ class HomeViewModel @Inject constructor(
 
     /**
      * Clears the [searchKeyword] property by setting it to an empty string.
+     * Sets [gitHubSearchResultState] with a successful response of an empty list.
      */
     fun clearSearchKeyword() {
         searchKeyword = ""
+        _gitHubSearchResultState.value = GitHubResponse.Success(emptyList())
     }
 
     /**
@@ -158,7 +160,7 @@ class HomeViewModel @Inject constructor(
 
     /**
      * Retrieves the recent updates from the database and updates the UI accordingly.
-     * Recent updates includes whether user has added a GitHub repository to user's saved list.
+     * Recent updates includes whether user has added/removed a GitHub repository from user's saved list.
      */
     fun getRecentUpdateFromDatabase() {
         viewModelScope.launch {
