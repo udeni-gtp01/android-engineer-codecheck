@@ -191,10 +191,6 @@ class HomeViewModelTest {
             val keyword = "repo"
             val errorMessage = "Failed searchGitHubRepositories"
 
-            `when`(localGitHubDatabaseRepository.getMySavedList())
-                .thenReturn(
-                    MutableStateFlow(GitHubResponse.Success(emptyList()))
-                )
             `when`(gitHubApiRepository.searchGitHubRepositories(keyword))
                 .thenReturn(
                     MutableStateFlow(GitHubResponse.Error(errorMessage))
