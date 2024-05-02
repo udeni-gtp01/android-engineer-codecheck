@@ -59,3 +59,25 @@ data class GitHubRepositoryOwner(
     @SerializedName("login") val login: String?,
     @SerializedName("avatar_url") val avatarUrl: String?
 ) : Parcelable
+
+/**
+ * Converts a [GitHubRepository] object to a corresponding [LocalGitHubRepository] object.
+ *
+ * @param isSaved Boolean indicating whether the repository is saved in the user's saved list in local database.
+ * @return A [LocalGitHubRepository] object with properties copied from the [GitHubRepository] object.
+ */
+fun GitHubRepository.toLocalGitHubRepository(isSaved: Boolean): LocalGitHubRepository {
+    return LocalGitHubRepository(
+        id = this.id,
+        forksCount = this.forksCount,
+        language = this.language,
+        name = this.name,
+        openIssuesCount = this.openIssuesCount,
+        stargazersCount = this.stargazersCount,
+        watchersCount = this.watchersCount,
+        htmlUrl = this.htmlUrl,
+        ownerLogin = this.owner?.login,
+        ownerAvatarUrl = this.owner?.avatarUrl,
+        isSaved = isSaved
+    )
+}

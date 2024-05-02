@@ -2,7 +2,7 @@ package jp.co.yumemi.android.code_check.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val md_theme_light_primary = Color(0xFF8B4483)
+val md_theme_light_primary = Color(0xFF380037)
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
 val md_theme_light_primaryContainer = Color(0xFFFFD7F4)
 val md_theme_light_onPrimaryContainer = Color(0xFF380037)
@@ -21,7 +21,7 @@ val md_theme_light_onErrorContainer = Color(0xFF410002)
 val md_theme_light_background = Color(0xFFFFFBFF)
 val md_theme_light_onBackground = Color(0xFF1F1A1D)
 val md_theme_light_surface = Color(0xFFB47DAE)
-val md_theme_light_onSurface = Color(0xFF1F1A1D)
+val md_theme_light_onSurface = Color(0xFF380037)
 val md_theme_light_surfaceVariant = Color(0xFFEEDEE7)
 val md_theme_light_onSurfaceVariant = Color(0xFF4E444B)
 val md_theme_light_outline = Color(0xFF72646C)

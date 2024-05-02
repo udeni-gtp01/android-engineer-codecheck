@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Android Engineer CodeCheck</string>
+    <string name="app_name">Androidエンジニアコードチェック</string>
     <string name="searchInputText_hint">GitHub のリポジトリを検索できるよー</string>
     <string name="language_summary">" %s"</string>
     <string name="watchers_summary">" %s"</string>
@@ -16,7 +16,7 @@
     <string name="by">"オーナー "</string>
     <string name="null_value">"-"</string>
     <string name="retry">再試行</string>
-    <string name="no_result">結果がありません</string>
+    <string name="no_result">検索結果が見つかりませんでした</string>
     <string name="oh_no">エラー</string>
     <string name="no_internet">インターネット接続が見つかりませんでした。接続を確認して、再度お試しください。</string>
     <string name="invalid_request">エラーが発生しました。入力したリポジトリ名を確認して、再度お試しください。</string>
@@ -25,4 +25,13 @@
     <string name="timeout_error">エラーが発生しました。いつもより時間がかかっているようです。接続を確認して、再度お試しください。</string>
     <string name="loading">読み込み中</string>
     <string name="go_to_repository">リポジトリへ移動</string>
+    <string name="saved_screen_title">マイリスト</string>
+    <string name="saved_screen_description">保存したリポジトリのリストです</string>
+    <string name="home_screen_description">GitHubリポジトリを検索</string>
+    <string name="info_screen_title">情報</string>
+    <string name="info_screen_description">リポジトリの詳細情報</string>
+    <string name="unsave">保存解除</string>
+    <string name="save">保存</string>
+    <string name="saved">ブックマーク</string>
+    <string name="empty_saved_list">保存済みリストが空です</string>
 </resources>

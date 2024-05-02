@@ -24,11 +24,12 @@ import jp.co.yumemi.android.code_check.constant.ResponseCode.IOEXCEPTION
 import jp.co.yumemi.android.code_check.constant.ResponseCode.TIMEOUT_EXCEPTION
 
 /**
- * Composable function for displaying an error screen with a title, error message, and retry button.
+ * Composable function for rendering an error message.
+ * This function displays an error title, error message, and a retry button.
  *
- * @param errorTitle The title of the error message.
- * @param errorMessage The detailed error message.
- * @param onRetryButtonClicked Callback to handle the retry button click.
+ * @param errorTitle The resource ID of the error title.
+ * @param errorCode Optional error code to determine the error message.
+ * @param onRetryButtonClicked Callback function to handle the retry button click.
  */
 @Composable
 fun ErrorScreen(
@@ -51,7 +52,7 @@ fun ErrorScreen(
 }
 
 /**
- * Function to retrieve localized error message for the provided error code.
+ * Function to retrieve the localized error message for the provided error code.
  *
  * @param errorCode The error code to determine the error message.
  * @return The resource ID of the corresponding error message.
@@ -110,6 +111,7 @@ fun LoadErrorSection(
 
 /**
  * Preview function for the ErrorScreen composable, used for Compose UI preview.
+ * This is useful during the development process.
  */
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
