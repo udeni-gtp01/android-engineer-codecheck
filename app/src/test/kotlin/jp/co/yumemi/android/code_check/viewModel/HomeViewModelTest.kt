@@ -97,9 +97,6 @@ class HomeViewModelTest {
     @Test
     fun `provided valid keyword should search for the repository list`() =
         runTest {
-            // List represents GitHub repositories saved in user's saved list
-            val savedRepoList = emptyList<SavedGitHubRepository>()
-
             // List represents GitHub repositories searched from GitHub API
             val searchedRepoList = listOf(testGitHubRepository1, testGitHubRepository2)
 
@@ -114,7 +111,7 @@ class HomeViewModelTest {
 
             `when`(localGitHubDatabaseRepository.getMySavedList())
                 .thenReturn(
-                    MutableStateFlow(GitHubResponse.Success(savedRepoList))
+                    MutableStateFlow(GitHubResponse.Success(emptyList()))
                 )
             `when`(gitHubApiRepository.searchGitHubRepositories(keyword))
                 .thenReturn(
